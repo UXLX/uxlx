@@ -1,0 +1,55 @@
+<ion-header>
+  <ion-navbar>
+    <button ion-button menuToggle>
+      <ion-icon name="menu"></ion-icon>
+    </button>
+    <ion-title>Lesson 1</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content class="lesson-page">
+
+  <ion-slides pager paginationType="progress" (ionSlideDidChange)="getSlideProgress()">
+    <ion-slide *ngFor="let slide of slides" >
+      <div *ngIf="slide.image">
+        <img [src]="slide.image" class="slide-image {{slide.imgClass}}"/>
+      </div>
+      <div [ngClass]="slide.specialImg !== undefined ? 'lesson-special-div': 'lesson-title-div'">
+        <img [src]="slide.specialImg" *ngIf="slide.specialImg" alt="" class="special-img" />
+        <h2 *ngIf="slide.title" class="slide-title {{slide.titleClass}}" [innerHTML]="slide.title"></h2>
+        <ion-icon *ngIf="completedQ1 && slide.choiceQuestion" name="checkmark-circle" class="check-icon"></ion-icon>
+      </div>
+      <div *ngIf="slide.videoUrl" class="intrinsic-container intrinsic-container-16x9">
+        <iframe [src]="slide.videoUrl | youtube" frameborder="0" allowfullscreen></iframe>
+      </div>
+      <p [innerHTML]="slide.description" class="text-left"></p>
+      <div *ngIf="slide.choiceQuestion">
+        <hr/>
+        <ion-grid>
+          <ion-row>
+            <ion-col col-12 col-lg>
+              <button ion-button block color="light" class="choice" (click)="presentModal()"><p class="text-wrap">{{slide.choice1}}</p></button>
+            </ion-col>
+            <ion-col col-12 col-lg>
+              <button ion-button block color="light" class="choice" (click)="presentModal()"><p class="text-wrap">{{slide.choice2}}</p></button>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </div>
+      <button *ngIf="slide.lastCard" ion-button large icon-end color="cyan" (click)="goHome()">
+        Done
+        <ion-icon name="checkmark-circle-outline"></ion-icon>
+      </button>
+    </ion-slide>
+    <!-- <ion-slide>
+      <ion-toolbar>
+      </ion-toolbar>
+      <img src="assets/icons/slide4.svg" class="slide-image"/>
+      <h2 class="slide-title">Ready to Learn?</h2>
+      <button ion-button large clear icon-end color="primary" (click)="goHome()">
+        Continue
+        <ion-icon name="arrow-forward"></ion-icon>
+      </button>
+    </ion-slide> -->
+  </ion-slides>
+</ion-content>
