@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 21.1.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 32 32" style="enable-background:new 0 0 32 32;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:#00B4B4;}
+	.st1{display:none;}
+	.st2{display:inline;fill:#00B4B4;}
+	.st3{display:inline;}
+	.st4{display:inline;fill:none;stroke:#00B4B4;stroke-miterlimit:10;}
+	.st5{display:inline;fill:#00B4B4;stroke:#00B4B4;stroke-miterlimit:10;}
+	.st6{fill:#FFFFFF;}
+</style>
+<rect x="0" class="st0" width="32" height="32"/>
+<g class="st1">
+	<rect x="-63" y="-130.5" class="st2" width="430" height="210.5"/>
+</g>
+<g class="st1">
+	<g class="st3">
+		<path class="st0" d="M31,4v24H1V4H31 M32,3H0v26h32V3L32,3z"/>
+	</g>
+	<rect x="9.7" y="10.5" class="st4" width="12.7" height="11"/>
+	<g class="st3">
+		<circle class="st0" cx="9.7" cy="21.5" r="4.5"/>
+	</g>
+	<g class="st3">
+		<circle class="st0" cx="22.3" cy="10.5" r="4.5"/>
+	</g>
+	<polyline class="st5" points="20.2,10.6 21.4,11.9 24.1,8.8 	"/>
+	<line class="st4" x1="11.2" y1="20" x2="8.1" y2="23"/>
+	<line class="st4" x1="11.2" y1="23" x2="8.1" y2="20"/>
+</g>
+<g class="st1">
+	<path class="st2" d="M22.3,6c-2.3,0-4.2,1.8-4.4,4H9.2v7.1c-2.2,0.3-4,2.1-4,4.4c0,2.5,2,4.5,4.5,4.5c2.3,0,4.2-1.8,4.4-4h8.7V15
+		c2.2-0.3,4-2.1,4-4.4C26.8,8,24.8,6,22.3,6z M11.5,22.7l-0.7,0.7l-1.2-1.2l-1.2,1.2l-0.7-0.7L9,21.5l-1.2-1.2l0.7-0.7l1.2,1.2
+		l1.2-1.2l0.7,0.7l-1.2,1.2L11.5,22.7z M21.8,21h-7.7c-0.2-2.1-1.9-3.7-3.9-3.9V11h7.7c0.2,2.1,1.9,3.7,4,3.9
+		C21.8,14.9,21.8,21,21.8,21z M21.4,12.6L19.8,11l0.7-0.7l0.9,0.9l2.4-2.7l0.7,0.7L21.4,12.6z"/>
+</g>
+<rect x="3.6" y="4.6" class="st6" width="24.6" height="23"/>
+<g>
+	<g>
+		<polygon class="st0" points="21.4,11.1 20.5,10.3 19.8,11 21.4,12.6 24.5,9.1 23.8,8.5 		"/>
+		<polygon class="st0" points="10.8,19.6 9.7,20.8 8.5,19.6 7.8,20.3 9,21.5 7.8,22.7 8.5,23.4 9.7,22.2 10.8,23.4 11.5,22.7 
+			10.4,21.5 11.5,20.3 		"/>
+		<path class="st0" d="M17.9,11h-7.7v6.1c2.1,0.2,3.7,1.9,3.9,3.9h7.7v-6.1C19.8,14.7,18.1,13.1,17.9,11z"/>
+		<path class="st0" d="M0,3v26h32V3H0z M22.8,14.9V22h-8.7c-0.3,2.2-2.1,4-4.4,4c-2.5,0-4.5-2-4.5-4.5c0-2.3,1.8-4.2,4-4.5v-7h8.7
+			c0.3-2.2,2.1-4,4.5-4c2.5,0,4.5,2,4.5,4.5C26.8,12.8,25.1,14.7,22.8,14.9z"/>
+	</g>
+</g>
+</svg>
