@@ -174,6 +174,13 @@
     padding-left: 10px;
     margin: 20px 10px;
   }
+
+  @media all and (min-width: 374px) {
+    p {
+      font-size: 1em;
+    }
+  }
+
   @media all and (max-width: 480px) {
 
     .lesson-image-start {

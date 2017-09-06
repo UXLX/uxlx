@@ -132,17 +132,6 @@
     font-weight: 500;
   }
 
-  p {
-    padding: 5px 30px;
-    font-size: 0.9em;
-    line-height: 1.5;
-    text-align: left;
-
-    b {
-      color: #000000;
-    }
-  }
-
   p.modal-page {
     font-size: 1.3em !important;
     color: map-get($colors, dark);
