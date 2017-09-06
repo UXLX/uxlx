@@ -1,3 +1,39 @@
 page-home {
+  .grey-bg {
+    background: #586971;
+  }
 
+  .cyan-color {
+    color: #00B4B4;
+    font-weight: bold;
+  }
+
+  .card {
+    color: #202020;
+  }
+
+  .card-title {
+    font-size: 1.3em;
+    font-weight: bold;
+  }
+
+  .card-subtitle {
+    font-size: 0.8em;
+    padding: 16px 0px 0px 16px;
+  }
+
+  .card-content {
+    font-size: 1.1em;
+  }
+
+  @media all and (min-width: 1330px) {
+    .scroll-content .card {
+      width: 60%;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .item {
+      width: 100% !important;
+    }
+  }
 }

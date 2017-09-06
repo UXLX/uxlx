@@ -1,5 +1,8 @@
 {
   "name": "uxLX",
-  "app_id": "",
-  "type": "ionic-angular"
+  "app_id": "d3310808",
+  "type": "ionic-angular",
+  "integrations": {
+    "cordova": {}
+  }
 }

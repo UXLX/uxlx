@@ -2,9 +2,10 @@ import { Component, ViewChild } from '@angular/core';
 import { Nav, Platform } from 'ionic-angular';
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
+import { Storage } from '@ionic/storage';
 
 import { HomePage } from '../pages/home/home';
-import { ListPage } from '../pages/list/list';
+import { IntroPage } from '../pages/intro/intro';
 
 @Component({
   templateUrl: 'app.html'
@@ -16,15 +17,28 @@ export class MyApp {
 
   pages: Array<{title: string, component: any}>;
 
-  constructor(public platform: Platform, public statusBar: StatusBar, public splashScreen: SplashScreen) {
-    this.initializeApp();
+  constructor(
+    public platform: Platform,
+    public statusBar: StatusBar,
+    public splashScreen: SplashScreen,
+    private _storage: Storage) {
+      // Check if the user has already seen the tutorial
+      this._storage.get('hasSeenTutorial')
+        .then((hasSeenTutorial) => {
+          if (hasSeenTutorial) {
+            this.rootPage = HomePage;
+          } else {
+            this.rootPage = IntroPage;
+          }
+          this.initializeApp();
+        });
+
 
     // used for an example of ngFor and navigation
     this.pages = [
       { title: 'Home', component: HomePage },
-      { title: 'List', component: ListPage }
+      { title: 'Getting Started', component: IntroPage },
     ];
-
   }
 
   initializeApp() {
@@ -41,4 +55,5 @@ export class MyApp {
     // we wouldn't want the back button to show in this scenario
     this.nav.setRoot(page.component);
   }
+
 }

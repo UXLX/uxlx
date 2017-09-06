@@ -1,3 +1,4 @@
+<ion-split-pane>
 <ion-menu [content]="content">
   <ion-header>
     <ion-toolbar>
@@ -16,4 +17,5 @@
 </ion-menu>
 
 <!-- Disable swipe-to-go-back because it's poor UX to combine STGB with side menus -->
-<ion-nav [root]="rootPage" #content swipeBackEnabled="false"></ion-nav>
+<ion-nav [root]="rootPage" #content main swipeBackEnabled="false"></ion-nav>
+</ion-split-pane>
