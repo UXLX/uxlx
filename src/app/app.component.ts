@@ -34,7 +34,7 @@ export class MyApp {
           }
           this.initializeApp();
         });
-      this.screenOrientation.lock(this.screenOrientation.ORIENTATIONS.PORTRAIT);
+      this._screenOrientation.lock(this._screenOrientation.ORIENTATIONS.PORTRAIT);
 
     // used for an example of ngFor and navigation
     this.pages = [
