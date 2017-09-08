@@ -2,6 +2,7 @@ import { Component, ViewChild } from '@angular/core';
 import { Nav, Platform } from 'ionic-angular';
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
+import { ScreenOrientation } from '@ionic-native/screen-orientation';
 import { Storage } from '@ionic/storage';
 
 import { HomePage } from '../pages/home/home';
@@ -21,7 +22,8 @@ export class MyApp {
     public platform: Platform,
     public statusBar: StatusBar,
     public splashScreen: SplashScreen,
-    private _storage: Storage) {
+    private _storage: Storage,
+    private _screenOrientation: ScreenOrientation) {
       // Check if the user has already seen the tutorial
       this._storage.get('hasSeenTutorial')
         .then((hasSeenTutorial) => {
@@ -32,7 +34,7 @@ export class MyApp {
           }
           this.initializeApp();
         });
-
+      this.screenOrientation.lock(this.screenOrientation.ORIENTATIONS.PORTRAIT);
 
     // used for an example of ngFor and navigation
     this.pages = [
