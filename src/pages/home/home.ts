@@ -3,6 +3,7 @@ import { NavController, NavParams, Events } from 'ionic-angular';
 import { Lesson1Page } from '../lesson1/lesson1';
 import { Lesson2Page } from '../lesson2/lesson2';
 import { Storage } from '@ionic/storage';
+import { GooglePlus } from '@ionic-native/google-plus';
 import firebase from 'firebase';
 
 @Component({
@@ -18,28 +19,28 @@ export class HomePage {
   lesson2Complete: boolean = false;
   public userProfile:any = null;
   googleLogin():void {
-    const provider = new firebase.auth.GoogleAuthProvider();
+  this._googlePlus.login({
+  'webClientId': '919887709507-11gl2nj4e10bip4ufu6ip3f8g2qm3gd8.apps.googleusercontent.com',
+  'offline': true
+}).then( res => {
+        const googleCredential = firebase.auth.GoogleAuthProvider
+            .credential(res.idToken);
 
-    firebase.auth().signInWithRedirect(provider).then( () => {
-      firebase.auth().getRedirectResult().then( result => {
-        // This gives you a Google Access Token.
-        // You can use it to access the Google API.
-        var token = result.credential.accessToken;
-        // The signed-in user info.
-        var user = result.user;
-        console.log(result);
-      }).catch(function(error) {
-        // Handle Errors here.
-        console.log(error);
+        firebase.auth().signInWithCredential(googleCredential)
+      .then( response => {
+          console.log("Firebase success: " + JSON.stringify(response));
       });
-    });
-  }
+}, err => {
+    console.error("Error: ", err)
+});
+}
 
   constructor(
   public navCtrl: NavController,
   public navParams: NavParams,
   public events: Events,
-  private _storage: Storage) {
+  private _storage: Storage,
+  private _googlePlus: GooglePlus) {
     this.loadProgress();
     //this._storage.clear();
 
@@ -49,6 +50,7 @@ export class HomePage {
         console.log(user);
         this.userProfile = user;
       } else {
+        this.userProfile = null;
         console.log("There's no user here");
       }
     });
