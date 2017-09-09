@@ -27,7 +27,7 @@ export class HomePage {
         var token = result.credential.accessToken;
         // The signed-in user info.
         var user = result.user;
-        //console.log(token, user);
+        console.log(token, user);
       }).catch(function(error) {
         // Handle Errors here.
         console.log(error.message);
@@ -46,7 +46,7 @@ export class HomePage {
     firebase.auth().onAuthStateChanged( user => {
       if (user) {
         //user.email gets the email
-        //console.log(user);
+        console.log(user);
         this.userProfile = user;
       } else {
         console.log("There's no user here");

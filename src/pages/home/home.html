@@ -7,9 +7,9 @@
   </ion-navbar>
 </ion-header>
   <ion-content padding class="grey-bg card">
-    <ion-card padding *ngIf="!userProfile" text-center>
+    <ion-card padding *ngIf="!userProfile" text-center style="height: 90%;">
         <h2>Sign In</h2>
-        <small>Why? We use your login id to send xAPI statements!</small>
+        <small>Why? We use your login ID to send xAPI statements!</small>
         <button ion-button block color="danger" (click)="googleLogin()">
           <ion-icon name="logo-googleplus"></ion-icon>
           Login with Google
