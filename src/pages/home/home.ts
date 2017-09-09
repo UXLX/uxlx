@@ -8,7 +8,7 @@ import firebase from 'firebase';
 
 @Component({
   selector: 'page-home',
-  templateUrl: 'home.html'
+  templateUrl: 'home.html',
 })
 export class HomePage {
 
@@ -18,22 +18,21 @@ export class HomePage {
   lesson2Progress: number = 0;
   lesson2Complete: boolean = false;
   public userProfile:any = null;
-  googleLogin():void {
-  this._googlePlus.login({
-  'webClientId': '919887709507-11gl2nj4e10bip4ufu6ip3f8g2qm3gd8.apps.googleusercontent.com',
-  'offline': true
-}).then( res => {
+    googleLogin():void {
+      this._googlePlus.login({
+      'webClientId': '919887709507-11gl2nj4e10bip4ufu6ip3f8g2qm3gd8.apps.googleusercontent.com',
+      'offline': true
+      }).then( res => {
         const googleCredential = firebase.auth.GoogleAuthProvider
             .credential(res.idToken);
-
         firebase.auth().signInWithCredential(googleCredential)
       .then( response => {
           console.log("Firebase success: " + JSON.stringify(response));
       });
-}, err => {
-    console.error("Error: ", err)
-});
-}
+      }, err => {
+        console.error("Error: ", err)
+      });
+    }
 
   constructor(
   public navCtrl: NavController,

@@ -4,6 +4,7 @@ import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { ScreenOrientation } from '@ionic-native/screen-orientation';
 import { Storage } from '@ionic/storage';
+import { GooglePlus } from '@ionic-native/google-plus';
 import firebase from 'firebase';
 
 import { HomePage } from '../pages/home/home';
@@ -21,6 +22,7 @@ export class MyApp {
   pages: Array<{title: string, component: any}>;
   googleSignOut():void {
     firebase.auth().signOut();
+    this._googlePlus.logout();
     this.nav.goToRoot(this.rootPage);
   }
 
@@ -29,7 +31,8 @@ export class MyApp {
     public statusBar: StatusBar,
     public splashScreen: SplashScreen,
     private _storage: Storage,
-    private _screenOrientation: ScreenOrientation) {
+    private _screenOrientation: ScreenOrientation,
+    private _googlePlus: GooglePlus) {
       // Check if the user has already seen the tutorial
       this._storage.get('hasSeenTutorial')
         .then((hasSeenTutorial) => {
@@ -70,6 +73,7 @@ export class MyApp {
         var errorMessage = error.message;
         console.log(errorMessage);
       });
+      
       firebase.auth().onAuthStateChanged( user => {
         if (user) {
           //user.email gets the email
@@ -79,6 +83,11 @@ export class MyApp {
           console.log("There's no user here");
         }
       });
+
+      var tag = document.createElement('script');
+      tag.src = "https://www.youtube.com/iframe_api";
+      var firstScriptTag = document.getElementsByTagName('script')[0];
+      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
   }
 

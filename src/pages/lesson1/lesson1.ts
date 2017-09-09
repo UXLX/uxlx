@@ -3,9 +3,11 @@ import { Platform, NavController, NavParams, ModalController, ViewController, Sl
 import { HomePage } from '../home/home';
 import { Storage } from '@ionic/storage';
 import { Network } from '@ionic-native/network';
+import { PlayerService } from '../../services/player.service';
 
 @Component({
-  templateUrl: 'lesson1.html'
+  templateUrl: 'lesson1.html',
+  providers: [PlayerService],
 })
 
 export class Lesson1Page {
@@ -17,7 +19,9 @@ export class Lesson1Page {
     public modalCtrl: ModalController,
     public events: Events,
     private _storage: Storage,
-    private _network: Network) {
+    private _network: Network,
+    public player: PlayerService) {
+      this.player.setupPlayer();
       //initialize your page here
       // watch network for a disconnect
       this._network.onDisconnect().subscribe(() => {
