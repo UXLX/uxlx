@@ -11,6 +11,14 @@ log.txt
 *.sublime-workspace
 .vscode/
 npm-debug.log*
+*.log
+*.sql
+*.sqlite
+*.jpg
+*.gif
+*.png
+*.svg
+*.ico
 
 .idea/
 .sass-cache/
@@ -26,6 +34,8 @@ platforms/
 plugins/
 plugins/android.json
 plugins/ios.json
+src/assets/
+src/assets/js/
 www/
 $RECYCLE.BIN/
 
