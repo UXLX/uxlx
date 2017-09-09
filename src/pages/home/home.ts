@@ -27,10 +27,10 @@ export class HomePage {
         var token = result.credential.accessToken;
         // The signed-in user info.
         var user = result.user;
-        console.log(token, user);
+        console.log(result);
       }).catch(function(error) {
         // Handle Errors here.
-        console.log(error.message);
+        console.log(error);
       });
     });
   }

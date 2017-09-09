@@ -81,13 +81,13 @@
             "cordova-plugin-inappbrowser": {},
             "cordova-plugin-buildinfo": {},
             "cordova-plugin-browsertab": {},
+            "cordova-universal-links-plugin": {},
             "cordova-plugin-customurlscheme": {
-                "URL_SCHEME": "com.firebase.cordova",
+                "URL_SCHEME": "io.ionic.uxlx",
                 "ANDROID_SCHEME": " ",
                 "ANDROID_HOST": " ",
                 "ANDROID_PATHPREFIX": "/"
-            },
-            "cordova-universal-links-plugin": {}
+            }
         },
         "platforms": [
             "android",
