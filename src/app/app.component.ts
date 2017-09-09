@@ -16,8 +16,13 @@ export class MyApp {
   @ViewChild(Nav) nav: Nav;
 
   rootPage: any = HomePage;
+  public userProfile:any = null;
 
   pages: Array<{title: string, component: any}>;
+  googleSignOut():void {
+    firebase.auth().signOut();
+    this.nav.goToRoot(this.rootPage);
+  }
 
   constructor(
     public platform: Platform,
@@ -35,7 +40,9 @@ export class MyApp {
           }
           this.initializeApp();
         });
-      this._screenOrientation.lock(this._screenOrientation.ORIENTATIONS.PORTRAIT);
+      this._screenOrientation.lock(this._screenOrientation.ORIENTATIONS.PORTRAIT).catch(function() {
+        console.log("screen lock orientation failed")
+      });;
 
     // used for an example of ngFor and navigation
     this.pages = [
@@ -51,6 +58,28 @@ export class MyApp {
         storageBucket: "gs://uxlx-3b266.appspot.com",
         messagingSenderId: "919887709507",
       });
+
+      firebase.auth().getRedirectResult().then(function(result) {
+        if (result.credential) {
+          var token = result.credential.accessToken;
+          var user = result.user;
+          //console.log(token, user);
+        }
+      }).catch(function(error) {
+        // Handle Errors here.
+        var errorMessage = error.message;
+        console.log(errorMessage);
+      });
+      firebase.auth().onAuthStateChanged( user => {
+        if (user) {
+          //user.email gets the email
+          //console.log(user);
+          this.userProfile = user;
+        } else {
+          console.log("There's no user here");
+        }
+      });
+
   }
 
   initializeApp() {

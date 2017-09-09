@@ -3,6 +3,7 @@ import { NavController, NavParams, Events } from 'ionic-angular';
 import { Lesson1Page } from '../lesson1/lesson1';
 import { Lesson2Page } from '../lesson2/lesson2';
 import { Storage } from '@ionic/storage';
+import firebase from 'firebase';
 
 @Component({
   selector: 'page-home',
@@ -15,6 +16,24 @@ export class HomePage {
   lesson1Complete: boolean = false;
   lesson2Progress: number = 0;
   lesson2Complete: boolean = false;
+  public userProfile:any = null;
+  googleLogin():void {
+    const provider = new firebase.auth.GoogleAuthProvider();
+
+    firebase.auth().signInWithRedirect(provider).then( () => {
+      firebase.auth().getRedirectResult().then( result => {
+        // This gives you a Google Access Token.
+        // You can use it to access the Google API.
+        var token = result.credential.accessToken;
+        // The signed-in user info.
+        var user = result.user;
+        //console.log(token, user);
+      }).catch(function(error) {
+        // Handle Errors here.
+        console.log(error.message);
+      });
+    });
+  }
 
   constructor(
   public navCtrl: NavController,
@@ -23,6 +42,16 @@ export class HomePage {
   private _storage: Storage) {
     this.loadProgress();
     //this._storage.clear();
+
+    firebase.auth().onAuthStateChanged( user => {
+      if (user) {
+        //user.email gets the email
+        //console.log(user);
+        this.userProfile = user;
+      } else {
+        console.log("There's no user here");
+      }
+    });
   }
 
   loadProgress(): void {
