@@ -4,6 +4,7 @@ import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { ScreenOrientation } from '@ionic-native/screen-orientation';
 import { Storage } from '@ionic/storage';
+import firebase from 'firebase';
 
 import { HomePage } from '../pages/home/home';
 import { IntroPage } from '../pages/intro/intro';
@@ -41,6 +42,15 @@ export class MyApp {
       { title: 'Home', component: HomePage },
       { title: 'Getting Started', component: IntroPage },
     ];
+
+    firebase.initializeApp({
+        apiKey: "AIzaSyDjXOOsmjuq-k6m7_sLYsU9zX955154Eew",
+        authDomain: "uxlx-3b266.firebaseapp.com",
+        databaseURL: "https://uxlx-3b266.firebaseio.com/",
+        projectId: "uxlx-3b266",
+        storageBucket: "gs://uxlx-3b266.appspot.com",
+        messagingSenderId: "919887709507",
+      });
   }
 
   initializeApp() {
@@ -57,5 +67,7 @@ export class MyApp {
     // we wouldn't want the back button to show in this scenario
     this.nav.setRoot(page.component);
   }
+
+
 
 }
