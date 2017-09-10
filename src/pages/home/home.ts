@@ -1,43 +1,65 @@
 import { Component } from '@angular/core';
-import { NavController, NavParams, Events } from 'ionic-angular';
+import { Platform, NavController, NavParams, Events } from 'ionic-angular';
 import { Lesson1Page } from '../lesson1/lesson1';
 import { Lesson2Page } from '../lesson2/lesson2';
 import { Storage } from '@ionic/storage';
+import TinCan from 'tincanjs';
+import { LRSService } from '../../services/lrs.service';
 import { GooglePlus } from '@ionic-native/google-plus';
 import firebase from 'firebase';
 
 @Component({
   selector: 'page-home',
   templateUrl: 'home.html',
+  providers: [LRSService],
 })
 export class HomePage {
-
   getUpdatedProgress: any;
   lesson1Progress: number = 0;
   lesson1Complete: boolean = false;
   lesson2Progress: number = 0;
   lesson2Complete: boolean = false;
-  public userProfile:any = null;
+  initialStatement: any;
+  public userProfile: any = null;
     googleLogin():void {
-      this._googlePlus.login({
-      'webClientId': '919887709507-11gl2nj4e10bip4ufu6ip3f8g2qm3gd8.apps.googleusercontent.com',
-      'offline': true
-      }).then( res => {
-        const googleCredential = firebase.auth.GoogleAuthProvider
-            .credential(res.idToken);
-        firebase.auth().signInWithCredential(googleCredential)
-      .then( response => {
-          console.log("Firebase success: " + JSON.stringify(response));
-      });
-      }, err => {
-        console.error("Error: ", err)
-      });
+      if (this.platform.is('cordova')) {
+        this._googlePlus.login({
+        'webClientId': '919887709507-11gl2nj4e10bip4ufu6ip3f8g2qm3gd8.apps.googleusercontent.com',
+        'offline': true
+        }).then( res => {
+          const googleCredential = firebase.auth.GoogleAuthProvider
+              .credential(res.idToken);
+          firebase.auth().signInWithCredential(googleCredential)
+        .then( response => {
+            console.log("Firebase success: " + JSON.stringify(response));
+        });
+        }, err => {
+          console.error("Error: ", err)
+        });
+      } else {
+        const provider = new firebase.auth.GoogleAuthProvider();
+        firebase.auth().signInWithRedirect(provider).then( () => {
+          firebase.auth().getRedirectResult().then( result => {
+            // This gives you a Google Access Token.
+            // You can use it to access the Google API.
+            var token = result.credential.accessToken;
+            // The signed-in user info.
+            var user = result.user;
+            console.log(token, user);
+          }).catch(function(error) {
+            // Handle Errors here.
+            console.log(error.message);
+          });
+        });
+      }
     }
 
   constructor(
   public navCtrl: NavController,
+  public platform: Platform,
   public navParams: NavParams,
   public events: Events,
+  public lrs: LRSService,
   private _storage: Storage,
   private _googlePlus: GooglePlus) {
     this.loadProgress();
@@ -48,6 +70,42 @@ export class HomePage {
         //user.email gets the email
         console.log(user);
         this.userProfile = user;
+        this.initialStatement = new TinCan.Statement({
+            actor: {
+                name: user.displayName,
+                mbox: user.email,
+            },
+            verb: {
+                id: "https://brindlewaye.com/xAPITerms/verbs/loggedin/",
+                display: {'en-US': 'logged in to'}
+            },
+            "object": {
+              "id": "http://example.com/activities/ux-lx-app",
+                "definition": {
+                  "type": "http://activitystrea.ms/schema/1.0/application",
+                  "name": { "en-US": "UX + LX app" }
+                }
+            },
+        });
+        this.lrs.lrs.saveStatement(
+          this.initialStatement,
+          {
+            callback: function (err, xhr) {
+              if (err !== null) {
+                if (xhr !== null) {
+                  console.log("Failed to save statement: " + xhr.responseText + " (" + xhr.status + ")");
+                  // TODO: do something with error, didn't save statement
+                  return;
+                }
+                console.log("Failed to save statement: " + err);
+                // TODO: do something with error, didn't save statement
+                return;
+              }
+              console.log("Statement saved");
+              // TODO: do something with success (possibly ignore)
+            }
+          }
+        );
       } else {
         this.userProfile = null;
         console.log("There's no user here");

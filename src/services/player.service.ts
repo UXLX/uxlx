@@ -10,7 +10,8 @@ export class PlayerService {
     videoTitle: null,
     playerHeight: '360',
     playerWidth: '640'
-  }
+  };
+  ytVideoID: string;
 
   constructor() {
     this.setupPlayer();
@@ -53,12 +54,37 @@ export class PlayerService {
       this.youtube.ready = true;
       this.bindPlayer('placeholder');
       this.loadPlayer();
+      console.log(this.youtube.player);
+      //this.ytVideoID = 'http://www.youtube.com/watch?v=' + this.youtube.player.b.c.videoId;
     }
   }
 
   launchPlayer(id): void {
     this.youtube.player.loadVideoById(id);
     this.youtube.videoId = id;
+    console.log(this.youtube.videoId);
     return this.youtube;
   }
+
+  /* playerStateChange(event): void {
+    switch (event.data) {
+      case (window['YT'].PlayerState.PLAYING):
+          break;
+      case (window['YT'].PlayerState.PAUSED):
+          if (lastPlayer2State == window['YT'].PlayerState.PLAYING) {
+              videoWatched(lastPlayer2Time, youTubeEmbeddedplayer.getCurrentTime(), ytEmbeddedVideoTitle, ytEmbeddedVideoID)
+          } else if (lastPlayerState == YT.PlayerState.PAUSED) {
+              videoWatched(lastPlayer2Time, youTubeEmbeddedplayer.getCurrentTime(), ytEmbeddedVideoTitle, ytEmbeddedVideoID);
+          }
+          break;
+      case (YT.PlayerState.ENDED):
+          //videoEnded();
+          break;
+      case (YT.PlayerState.UNSTARTED):
+          break;
+    }
+
+    lastPlayer2Time = youTubeEmbeddedplayer.getCurrentTime();
+    lastPlayer2State = event.data;
+  } */
 }
