@@ -20,7 +20,7 @@
         <ion-icon *ngIf="completedQ1 && slide.choiceQuestion" name="checkmark-circle" class="check-icon"></ion-icon>
       </div>
       <div *ngIf="slide.videoUrl" class="intrinsic-container intrinsic-container-16x9">
-        <iframe [src]="slide.videoUrl | youtube" frameborder="0" allowfullscreen></iframe>
+        <div id="youTubeIframe"></div>
       </div>
       <p [innerHTML]="slide.description" class="text-left"></p>
       <div *ngIf="slide.choiceQuestion">

@@ -13,6 +13,7 @@ import { PlayerService } from '../../services/player.service';
 export class Lesson1Page {
   completedQ1: boolean = false;
   lessonComplete: boolean = false;
+  videoId: string;
   constructor(
     public navCtrl: NavController,
     public platform: Platform,
@@ -20,8 +21,8 @@ export class Lesson1Page {
     public events: Events,
     private _storage: Storage,
     private _network: Network,
+    private _navParams: NavParams,
     public player: PlayerService) {
-      this.player.setupPlayer();
       //initialize your page here
       // watch network for a disconnect
       this._network.onDisconnect().subscribe(() => {
@@ -34,7 +35,8 @@ export class Lesson1Page {
   }
   @ViewChild(Slides) slideShow: Slides;
   slidePercentage: number;
-
+  userEmail: string = this._navParams.get('userEmail');
+  userName: string = this._navParams.get('userName');
   slides = [
     {
       title: "<h1 class='lesson-title'>What is UX and Why do I Need it?</h1>",
@@ -64,7 +66,8 @@ export class Lesson1Page {
     {
       title: "",
       description: "The discipline of User Experience (UX) is about tackling those assumptions up front to build a better product.",
-      videoUrl: "https://www.youtube.com/embed/Ovj4hFxko7c?rel=0"
+      videoUrl: "https://www.youtube.com/embed/Ovj4hFxko7c?rel=0?enablejsapi=1",
+      videoId: "Ovj4hFxko7c",
     },
     {
       title: "Ask Yourself",
@@ -188,9 +191,17 @@ export class Lesson1Page {
 
   getSlideProgress() {
     let currentIndex = this.slideShow.getActiveIndex();
+    let currentSlide = this.slides[this.slideShow.getActiveIndex()];
+
     //console.log('Current index is', currentIndex);
     this.slidePercentage = this.slideShow.getActiveIndex()/(this.slideShow.length() - 1) * 100;
     //console.log('Lesson Page: Slide Progress is ' + this.slidePercentage);
+    if(currentSlide.hasOwnProperty('videoId')) {
+      console.log(currentSlide['videoId']);
+
+      this.player.launchPlayer(currentSlide['videoId'], this.userEmail, this.userName);
+      console.log(this.player);
+    }
     let data = {
       lesson1Progress: this.slidePercentage || 0,
     }
@@ -217,6 +228,10 @@ export class Lesson1Page {
       //console.log('Did you answer the question? ', val);
       this.completedQ1 = val;
     });
+  }
+
+  ionSlideDidChange() {
+    console.log(this.slideShow.getActiveIndex());
   }
 
 }

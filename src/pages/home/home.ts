@@ -124,7 +124,10 @@ export class HomePage {
   };
 
   lessonOne() {
-    this.navCtrl.setRoot(Lesson1Page)
+    this.navCtrl.setRoot(Lesson1Page, {
+      userName: this.userProfile.displayName,
+      userEmail: this.userProfile.email,
+    })
   }
 
   lessonTwo() {

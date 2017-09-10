@@ -73,7 +73,7 @@ export class MyApp {
         var errorMessage = error.message;
         console.log(errorMessage);
       });
-      
+
       firebase.auth().onAuthStateChanged( user => {
         if (user) {
           //user.email gets the email
@@ -83,11 +83,6 @@ export class MyApp {
           console.log("There's no user here");
         }
       });
-
-      var tag = document.createElement('script');
-      tag.src = "https://www.youtube.com/iframe_api";
-      var firstScriptTag = document.getElementsByTagName('script')[0];
-      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
   }
 
