@@ -127,8 +127,8 @@ launchPlayer(id, userEmail, userName): void {
         }
     });
     console.log(self.videoTinCan);
-    console.log(self.lrs.lrs);
-    self.lrs.lrs.saveStatement(
+
+    /*self.lrs.lrs.saveStatement(
       self.videoTinCan,
       {
         callback: function (err, xhr) {
@@ -148,7 +148,7 @@ launchPlayer(id, userEmail, userName): void {
           // TOOO: do something with success (possibly ignore)
         }
     }
-  );
+  );*/
   }
 
 
