@@ -4,8 +4,11 @@ import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { ScreenOrientation } from '@ionic-native/screen-orientation';
 import { Storage } from '@ionic/storage';
+import TinCan from 'tincanjs';
+import { LRSService } from '../services/lrs.service';
 import { GooglePlus } from '@ionic-native/google-plus';
 import firebase from 'firebase';
+import { AngularFireAuth } from 'angularfire2/auth';
 
 import { HomePage } from '../pages/home/home';
 import { IntroPage } from '../pages/intro/intro';
@@ -18,6 +21,7 @@ export class MyApp {
 
   rootPage: any = HomePage;
   public userProfile:any = null;
+  initialStatement: any;
 
   pages: Array<{title: string, component: any}>;
   googleSignOut():void {
@@ -30,9 +34,11 @@ export class MyApp {
     public platform: Platform,
     public statusBar: StatusBar,
     public splashScreen: SplashScreen,
+    public lrs: LRSService,
     private _storage: Storage,
     private _screenOrientation: ScreenOrientation,
-    private _googlePlus: GooglePlus) {
+    private _googlePlus: GooglePlus,
+    public afAuth: AngularFireAuth) {
       // Check if the user has already seen the tutorial
       this._storage.get('hasSeenTutorial')
         .then((hasSeenTutorial) => {
@@ -53,36 +59,34 @@ export class MyApp {
       { title: 'Getting Started', component: IntroPage },
     ];
 
-    firebase.initializeApp({
-        apiKey: "AIzaSyDjXOOsmjuq-k6m7_sLYsU9zX955154Eew",
-        authDomain: "uxlx-3b266.firebaseapp.com",
-        databaseURL: "https://uxlx-3b266.firebaseio.com/",
-        projectId: "uxlx-3b266",
-        storageBucket: "gs://uxlx-3b266.appspot.com",
-        messagingSenderId: "919887709507",
-      });
-
-      firebase.auth().getRedirectResult().then(function(result) {
-        if (result.credential) {
-          var token = result.credential.accessToken;
-          var user = result.user;
-          //console.log(token, user);
-        }
-      }).catch(function(error) {
-        // Handle Errors here.
-        var errorMessage = error.message;
-        console.log(errorMessage);
-      });
-
-      firebase.auth().onAuthStateChanged( user => {
-        if (user) {
-          //user.email gets the email
-          //console.log(user);
-          this.userProfile = user;
-        } else {
-          console.log("There's no user here");
-        }
-      });
+    afAuth.authState.subscribe( user => {
+      if (user) {
+        this.rootPage = HomePage;
+        //user.email gets the email
+        console.log(user);
+        this.userProfile = user;
+        this.initialStatement = new TinCan.Statement({
+            actor: {
+                name: user.displayName,
+                mbox: user.email,
+            },
+            verb: {
+                id: "https://brindlewaye.com/xAPITerms/verbs/loggedin/",
+                display: {'en-US': 'logged in to'}
+            },
+            "object": {
+              "id": "http://example.com/activities/ux-lx-app",
+                "definition": {
+                  "type": "http://activitystrea.ms/schema/1.0/application",
+                  "name": { "en-US": "UX + LX app" }
+                }
+            },
+        });
+        console.log(this.initialStatement);
+      } else {
+        this.rootPage = 'LoginPage';
+      }
+    });
 
   }
 

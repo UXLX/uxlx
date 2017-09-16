@@ -5,8 +5,8 @@ import { Lesson2Page } from '../lesson2/lesson2';
 import { Storage } from '@ionic/storage';
 import TinCan from 'tincanjs';
 import { LRSService } from '../../services/lrs.service';
-import { GooglePlus } from '@ionic-native/google-plus';
 import firebase from 'firebase';
+import { AngularFireAuth } from 'angularfire2/auth';
 
 @Component({
   selector: 'page-home',
@@ -21,38 +21,6 @@ export class HomePage {
   lesson2Complete: boolean = false;
   initialStatement: any;
   public userProfile: any = null;
-    googleLogin():void {
-      if (this.platform.is('cordova')) {
-        this._googlePlus.login({
-        'webClientId': '919887709507-11gl2nj4e10bip4ufu6ip3f8g2qm3gd8.apps.googleusercontent.com',
-        'offline': true
-        }).then( res => {
-          const googleCredential = firebase.auth.GoogleAuthProvider
-              .credential(res.idToken);
-          firebase.auth().signInWithCredential(googleCredential)
-        .then( response => {
-            console.log("Firebase success: " + JSON.stringify(response));
-        });
-        }, err => {
-          console.error("Error: ", err)
-        });
-      } else {
-        const provider = new firebase.auth.GoogleAuthProvider();
-        firebase.auth().signInWithRedirect(provider).then( () => {
-          firebase.auth().getRedirectResult().then( result => {
-            // This gives you a Google Access Token.
-            // You can use it to access the Google API.
-            var token = result.credential.accessToken;
-            // The signed-in user info.
-            var user = result.user;
-            console.log(token, user);
-          }).catch(function(error) {
-            // Handle Errors here.
-            console.log(error.message);
-          });
-        });
-      }
-    }
 
   constructor(
   public navCtrl: NavController,
@@ -60,12 +28,16 @@ export class HomePage {
   public navParams: NavParams,
   public events: Events,
   public lrs: LRSService,
-  private _storage: Storage,
-  private _googlePlus: GooglePlus) {
+  public afAuth: AngularFireAuth,
+  private _storage: Storage) {
     this.loadProgress();
     //this._storage.clear();
-
-    firebase.auth().onAuthStateChanged( user => {
+    afAuth.authState.subscribe( user => {
+      if (user) {
+        this.userProfile = user;
+      }
+    });
+    /*firebase.auth().onIdTokenChanged( user => {
       if (user) {
         //user.email gets the email
         console.log(user);
@@ -110,7 +82,7 @@ export class HomePage {
         this.userProfile = null;
         console.log("There's no user here");
       }
-    });
+    }); */
   }
 
   loadProgress(): void {
@@ -123,11 +95,34 @@ export class HomePage {
     });
   };
 
+  launchedLesson (lessonNum) {
+    var launchLesson = new TinCan.Statement({
+        actor: {
+            name: this.userProfile.displayName,
+            mbox: this.userProfile.email,
+        },
+        verb: {
+            id: "http://adlnet.gov/expapi/verbs/launched",
+            display: {'en-US': 'launched'}
+        },
+        "object": {
+          "id": "http://example.com/activities/ux-lx-app",
+            "definition": {
+              "type": "http://activitystrea.ms/schema/1.0/application",
+              "name": { "en-US": lessonNum }
+            }
+        },
+    });
+
+    console.log(launchLesson);
+  }
+
   lessonOne() {
+    this.launchedLesson("Lesson 1");
     this.navCtrl.setRoot(Lesson1Page, {
       userName: this.userProfile.displayName,
       userEmail: this.userProfile.email,
-    })
+    });
   }
 
   lessonTwo() {

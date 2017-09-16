@@ -6,16 +6,8 @@
     <ion-title>Home</ion-title>
   </ion-navbar>
 </ion-header>
-  <ion-content padding class="grey-bg card">
-    <ion-card padding *ngIf="!userProfile" text-center style="height: 90%;">
-        <h2>Sign In</h2>
-        <small>Why? We use your login ID to send xAPI statements!</small>
-        <button ion-button block color="danger" (click)="googleLogin()">
-          <ion-icon name="logo-googleplus"></ion-icon>
-          Login with Google
-        </button>
-    </ion-card>
-    <ion-card (click)="lessonOne()" *ngIf="userProfile">
+  <ion-content class="grey-bg card">
+    <ion-card (click)="lessonOne()">
       <div class="cyan-color card-subtitle">
         Lesson 1
       </div>
@@ -31,7 +23,7 @@
         6 min
       </ion-item>
     </ion-card>
-    <ion-card (click)="lessonTwo()" *ngIf="userProfile">
+    <ion-card (click)="lessonTwo()">
       <div class="cyan-color card-subtitle">
         Lesson 2
       </div>
