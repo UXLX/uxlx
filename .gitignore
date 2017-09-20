@@ -36,6 +36,7 @@ plugins/android.json
 plugins/ios.json
 src/assets/
 src/assets/js/
+src/services/lrs.service.ts
 www/
 $RECYCLE.BIN/
 
