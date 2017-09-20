@@ -37,52 +37,6 @@ export class HomePage {
         this.userProfile = user;
       }
     });
-    /*firebase.auth().onIdTokenChanged( user => {
-      if (user) {
-        //user.email gets the email
-        console.log(user);
-        this.userProfile = user;
-        this.initialStatement = new TinCan.Statement({
-            actor: {
-                name: user.displayName,
-                mbox: user.email,
-            },
-            verb: {
-                id: "https://brindlewaye.com/xAPITerms/verbs/loggedin/",
-                display: {'en-US': 'logged in to'}
-            },
-            "object": {
-              "id": "http://example.com/activities/ux-lx-app",
-                "definition": {
-                  "type": "http://activitystrea.ms/schema/1.0/application",
-                  "name": { "en-US": "UX + LX app" }
-                }
-            },
-        });
-        this.lrs.lrs.saveStatement(
-          this.initialStatement,
-          {
-            callback: function (err, xhr) {
-              if (err !== null) {
-                if (xhr !== null) {
-                  console.log("Failed to save statement: " + xhr.responseText + " (" + xhr.status + ")");
-                  // TODO: do something with error, didn't save statement
-                  return;
-                }
-                console.log("Failed to save statement: " + err);
-                // TODO: do something with error, didn't save statement
-                return;
-              }
-              console.log("Statement saved");
-              // TODO: do something with success (possibly ignore)
-            }
-          }
-        );
-      } else {
-        this.userProfile = null;
-        console.log("There's no user here");
-      }
-    }); */
   }
 
   loadProgress(): void {
@@ -95,30 +49,39 @@ export class HomePage {
     });
   };
 
-  launchedLesson (lessonNum) {
+  launchedLesson (lessonTitle, lessonNum, lessonProgress) {
     var launchLesson = new TinCan.Statement({
-        actor: {
-            name: this.userProfile.displayName,
-            mbox: this.userProfile.email,
+      "actor": {
+          name: this.userProfile.displayName,
+          mbox: this.userProfile.email,
+      },
+      "verb": {
+          id: "http://adlnet.gov/expapi/verbs/launched",
+          display: {'en-US': 'launched'}
+      },
+      "object": {
+        "id": "http://example.com/activities/ux-lx-app",
+        "definition": {
+          "type": "http://adlnet.gov/expapi/activities/course",
+          "name": { "en-US": lessonTitle },
+          "extensions": {
+            "http://example.com/extension/lesson-progress": lessonProgress + "%"
+          }
         },
-        verb: {
-            id: "http://adlnet.gov/expapi/verbs/launched",
-            display: {'en-US': 'launched'}
-        },
-        "object": {
-          "id": "http://example.com/activities/ux-lx-app",
-            "definition": {
-              "type": "http://activitystrea.ms/schema/1.0/application",
-              "name": { "en-US": lessonNum }
-            }
-        },
+      },
+      "context": {
+        "author": {
+          "name": "Kristin Anthony",
+          "mbox": "mailto:kristin@knanthony.com"
+        }
+      },
     });
 
     console.log(launchLesson);
   }
 
   lessonOne() {
-    this.launchedLesson("Lesson 1");
+    this.launchedLesson("Lesson 1: What is UX and Why do I Need it?", "lesson1", this.lesson1Progress);
     this.navCtrl.setRoot(Lesson1Page, {
       userName: this.userProfile.displayName,
       userEmail: this.userProfile.email,

@@ -87,14 +87,17 @@ launchPlayer(id, userEmail, userName): void {
     self.ytEmbeddedVideoTitle = self.youtube.player.getVideoData().title;
     switch (event.data) {
       case (window['YT'].PlayerState.PLAYING):
+        self.videoPlayed(self.ytEmbeddedVideoTitle, self.ytEmbeddedVideoID, self.userEmail, self.userName);
         break;
       case (window['YT'].PlayerState.PAUSED):
         if (self.lastPlayer2State == window['YT'].PlayerState.PLAYING) {
           self.videoWatched(this.lastPlayer2Time, self.youtube.player.getCurrentTime(), self.ytEmbeddedVideoTitle, self.ytEmbeddedVideoID, self.userEmail, self.userName)
+        } else {
+          self.videoSkipped(this.lastPlayer2Time, self.youtube.player.getCurrentTime(), self.ytEmbeddedVideoTitle, self.ytEmbeddedVideoID, self.userEmail, self.userName)
         }
         break;
       case (window['YT'].PlayerState.ENDED):
-        //videoEnded();
+        self.videoEnded(self.ytEmbeddedVideoTitle, self.ytEmbeddedVideoID, self.userEmail, self.userName);
         break;
       case (window['YT'].PlayerState.UNSTARTED):
         break;
@@ -104,18 +107,61 @@ launchPlayer(id, userEmail, userName): void {
    self.lastPlayer2State = event.data;
  }
 
+  videoPlayed(videoTitle, videoID, userEmail, userName) {
+   var self = this;
+   const videoTinCan = new TinCan.Statement({
+       "actor": {
+           name: userName,
+           mbox: userEmail,
+       },
+       "verb": {
+           id: "http://activitystrea.ms/schema/1.0/play",
+           display: {'en-US': 'played'}
+       },
+       "object": {
+           id: videoID,
+           definition: {
+              name: { "en-US": videoTitle },
+           }
+       }
+   });
+   console.log(videoTinCan);
+
+   /*self.lrs.lrs.saveStatement(
+     videoTinCan,
+     {
+       callback: function (err, xhr) {
+         if (err !== null) {
+           if (xhr !== null) {
+             console.log("Failed to save statement: " + xhr.responseText + " (" + xhr.status + ")");
+             // TODO: do something with error, didn't save statement
+             return;
+           }
+
+           console.log("Failed to save statement: " + err);
+           // TODO: do something with error, didn't save statement
+           return;
+         }
+
+         console.log("Statement saved");
+         // TOOO: do something with success (possibly ignore)
+       }
+     }
+   );*/
+  }
+
   videoWatched(start, finish, videoTitle, videoID, userEmail, userName) {//start and finish in seconds
     var self = this;
-    self.videoTinCan = new TinCan.Statement({
-        actor: {
+    const videoTinCan = new TinCan.Statement({
+        "actor": {
             name: userName,
             mbox: userEmail,
         },
-        verb: {
+        "verb": {
             id: "http://activitystrea.ms/schema/1.0/watch",
             display: {'en-US': 'watched'}
         },
-        target: {
+        "object": {
             id: videoID,
             definition: {
                 name: { "en-US": videoTitle + " from " + self.timeString(start) + " to " + self.timeString(finish) },
@@ -126,10 +172,10 @@ launchPlayer(id, userEmail, userName): void {
             }
         }
     });
-    console.log(self.videoTinCan);
+    console.log(videoTinCan);
 
     /*self.lrs.lrs.saveStatement(
-      self.videoTinCan,
+      videoTinCan,
       {
         callback: function (err, xhr) {
           if (err !== null) {
@@ -147,33 +193,123 @@ launchPlayer(id, userEmail, userName): void {
           console.log("Statement saved");
           // TOOO: do something with success (possibly ignore)
         }
-    }
-  );*/
+      }
+    );*/
+  }
+
+  videoSkipped(start, finish, videoTitle, videoID, userEmail, userName) {//start and finish in seconds
+    var self = this;
+    const videoTinCan = new TinCan.Statement({
+        "actor": {
+            name: userName,
+            mbox: userEmail,
+        },
+        "verb": {
+            id: "http://id.tincanapi.com/verb/skipped",
+            display: {'en-US': 'skipped'}
+        },
+        "object": {
+            id: videoID,
+            definition: {
+                name: { "en-US": videoTitle + " from " + self.timeString(start) + " to " + self.timeString(finish) },
+                extensions: {
+                    "http://id.tincanapi.com/extension/starting-point": self.timeString(start),
+                    "http://id.tincanapi.com/extension/ending-point": self.timeString(finish)
+                }
+            }
+        }
+    });
+    console.log(videoTinCan);
+
+    /*self.lrs.lrs.saveStatement(
+      videoTinCan,
+      {
+        callback: function (err, xhr) {
+          if (err !== null) {
+            if (xhr !== null) {
+              console.log("Failed to save statement: " + xhr.responseText + " (" + xhr.status + ")");
+              // TODO: do something with error, didn't save statement
+              return;
+            }
+
+            console.log("Failed to save statement: " + err);
+            // TODO: do something with error, didn't save statement
+            return;
+          }
+
+          console.log("Statement saved");
+          // TOOO: do something with success (possibly ignore)
+        }
+      }
+    );*/
+  }
+
+  videoEnded(videoTitle, videoID, userEmail, userName) {
+   var self = this;
+   const videoTinCan = new TinCan.Statement({
+       "actor": {
+           name: userName,
+           mbox: userEmail,
+       },
+       "verb": {
+           id: "http://activitystrea.ms/schema/1.0/complete",
+           display: {'en-US': 'finished watching'}
+       },
+       "object": {
+           id: videoID,
+           definition: {
+              name: { "en-US": videoTitle },
+           }
+       }
+   });
+   console.log(videoTinCan);
+
+   /*self.lrs.lrs.saveStatement(
+     videoTinCan,
+     {
+       callback: function (err, xhr) {
+         if (err !== null) {
+           if (xhr !== null) {
+             console.log("Failed to save statement: " + xhr.responseText + " (" + xhr.status + ")");
+             // TODO: do something with error, didn't save statement
+             return;
+           }
+
+           console.log("Failed to save statement: " + err);
+           // TODO: do something with error, didn't save statement
+           return;
+         }
+
+         console.log("Statement saved");
+         // TOOO: do something with success (possibly ignore)
+       }
+     }
+   );*/
   }
 
 
-        // This helper function helps to generate the human readable
-        // time in the statement
-        timeString(time): string {
-          //expecting seconds
-          // multiply by 1000 because Date() requires miliseconds
-          var date = new Date(time * 1000);
-          var hh = date.getUTCHours();
-          var hhString = '';
-          var mm = date.getUTCMinutes();
-          var mmString = '';
-          var ss = date.getSeconds();
-          var ssString = '';
-          var ms = date.getMilliseconds();
-          var msString = '';
-          // If you were building a timestamp instead of a duration,
-          // you would uncomment the following line to get 12-hour (not 24) time
-          // if (hh > 12) {hh = hh % 12;}
-          // These lines ensure you have two-digits
-          if (hh < 10) {hhString = "0"+hh;}
-          if (mm < 10) {mmString = "0"+mm;}
-          if (ss < 10) {ssString = "0"+ss;}
-          // This formats your string to HH:MM:SS
-          return hhString + ":" + mmString + ":" + ssString + ":" + msString;
-        }
+  // This helper function helps to generate the human readable
+  // time in the statement
+  timeString(time): string {
+    //expecting seconds
+    // multiply by 1000 because Date() requires miliseconds
+    var date = new Date(time * 1000);
+    var hh = date.getUTCHours();
+    var hhString = '';
+    var mm = date.getUTCMinutes();
+    var mmString = '';
+    var ss = date.getSeconds();
+    var ssString = '';
+    var ms = date.getMilliseconds();
+    var msString = '';
+    // If you were building a timestamp instead of a duration,
+    // you would uncomment the following line to get 12-hour (not 24) time
+    // if (hh > 12) {hh = hh % 12;}
+    // These lines ensure you have two-digits
+    if (hh < 10) {hhString = "0"+hh;}
+    if (mm < 10) {mmString = "0"+mm;}
+    if (ss < 10) {ssString = "0"+ss;}
+    // This formats your string to HH:MM:SS
+    return hhString + ":" + mmString + ":" + ssString + ":" + msString;
+  }
 }

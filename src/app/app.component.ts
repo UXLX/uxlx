@@ -24,10 +24,8 @@ export class MyApp {
   initialStatement: any;
 
   pages: Array<{title: string, component: any}>;
-  googleSignOut():void {
-    firebase.auth().signOut();
-    this._googlePlus.logout();
-    this.nav.goToRoot(this.rootPage);
+  signOut(): firebase.Promise<any> {
+    return this.afAuth.auth.signOut();
   }
 
   constructor(
@@ -61,16 +59,15 @@ export class MyApp {
 
     afAuth.authState.subscribe( user => {
       if (user) {
-        this.rootPage = HomePage;
         //user.email gets the email
-        console.log(user);
+        //console.log(user);
         this.userProfile = user;
         this.initialStatement = new TinCan.Statement({
-            actor: {
+            "actor": {
                 name: user.displayName,
                 mbox: user.email,
             },
-            verb: {
+            "verb": {
                 id: "https://brindlewaye.com/xAPITerms/verbs/loggedin/",
                 display: {'en-US': 'logged in to'}
             },
@@ -83,8 +80,29 @@ export class MyApp {
             },
         });
         console.log(this.initialStatement);
+        /*
+        this.lrs.lrs.saveStatement(
+          this.initialStatement,
+          {
+            callback: function (err, xhr) {
+              if (err !== null) {
+                if (xhr !== null) {
+                  console.log("Failed to save statement: " + xhr.responseText + " (" + xhr.status + ")");
+                  // TODO: do something with error, didn't save statement
+                  return;
+                }
+                console.log("Failed to save statement: " + err);
+                // TODO: do something with error, didn't save statement
+                return;
+              }
+              console.log("Statement saved");
+              // TODO: do something with success (possibly ignore)
+            }
+          }
+        ); */
+        this.nav.setRoot(HomePage);
       } else {
-        this.rootPage = 'LoginPage';
+        this.nav.setRoot('LoginPage');
       }
     });
 

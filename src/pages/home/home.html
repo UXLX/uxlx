@@ -6,37 +6,39 @@
     <ion-title>Home</ion-title>
   </ion-navbar>
 </ion-header>
-  <ion-content class="grey-bg card">
-    <ion-card (click)="lessonOne()">
-      <div class="cyan-color card-subtitle">
-        Lesson 1
-      </div>
-      <ion-card-header class="text-left card-title">
-        What is UX and Why do I need it?
-      </ion-card-header>
-      <ion-card-content>
-        In this lesson, we'll cover what user experience is and why you as a learning experience designer need it.
-      </ion-card-content>
-      <ion-item class="card-subtitle" text-end float-end>
-        <progress-bar [progress]="lesson1Progress" *ngIf="lesson1Progress"></progress-bar>
-        <ion-icon name="clock"></ion-icon>
-        6 min
-      </ion-item>
-    </ion-card>
-    <ion-card (click)="lessonTwo()">
-      <div class="cyan-color card-subtitle">
-        Lesson 2
-      </div>
-      <ion-card-header class="card-title text-left">
-        Which One’s Which?
-      </ion-card-header>
-      <ion-card-content>
-        In this lesson, we'll talk about choosing a UX Research method for your ID project.
-      </ion-card-content>
-      <ion-item class="card-subtitle card" text-end float-end>
-        <progress-bar [progress]="lesson2Progress" *ngIf="lesson2Progress"></progress-bar>
-        <ion-icon name="clock"></ion-icon>
-        12 min
-      </ion-item>
-    </ion-card>
-  </ion-content>
+<ion-content class="grey-bg card">
+  <ion-card (click)="lessonOne()">
+    <div class="cyan-color card-subtitle">
+      Lesson 1
+    </div>
+    <ion-card-header class="text-left card-title">
+      What is UX and Why do I need it?
+    </ion-card-header>
+    <ion-card-content>
+      In this lesson, we'll cover what user experience is and why you as a learning experience designer need it.
+    </ion-card-content>
+    <ion-item class="card-subtitle" text-end float-end>
+      <progress-bar [progress]="lesson1Progress" *ngIf="lesson1Progress && !lesson1Complete"></progress-bar>
+      <progress-bar [progress]="100" *ngIf="lesson1Complete"></progress-bar>
+      <ion-icon name="clock"></ion-icon>
+      6 min
+    </ion-item>
+  </ion-card>
+  <ion-card (click)="lessonTwo()">
+    <div class="cyan-color card-subtitle">
+      Lesson 2
+    </div>
+    <ion-card-header class="card-title text-left">
+      Which One’s Which?
+    </ion-card-header>
+    <ion-card-content>
+      In this lesson, we'll talk about choosing a UX Research method for your ID project.
+    </ion-card-content>
+    <ion-item class="card-subtitle card" text-end float-end>
+      <progress-bar [progress]="lesson2Progress" *ngIf="lesson2Progress && !lesson2Complete"></progress-bar>
+      <progress-bar [progress]="100" *ngIf="lesson2Complete"></progress-bar>
+      <ion-icon name="clock"></ion-icon>
+      12 min
+    </ion-item>
+  </ion-card>
+</ion-content>

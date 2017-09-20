@@ -4,10 +4,12 @@ import { HomePage } from '../home/home';
 import { Storage } from '@ionic/storage';
 import { Network } from '@ionic-native/network';
 import { PlayerService } from '../../services/player.service';
+import { StatementService } from '../../services/statementgen.service';
+import { SafePipe } from '../../pipes/safepipe';
 
 @Component({
   templateUrl: 'lesson1.html',
-  providers: [PlayerService],
+  providers: [PlayerService, StatementService]
 })
 
 export class Lesson1Page {
@@ -22,8 +24,10 @@ export class Lesson1Page {
     private _storage: Storage,
     private _network: Network,
     private _navParams: NavParams,
-    public player: PlayerService) {
+    public player: PlayerService,
+    public statement: StatementService) {
       //initialize your page here
+        this.statement.giveCreds(this.userName, this.userEmail);
       // watch network for a disconnect
       this._network.onDisconnect().subscribe(() => {
         console.log('network was disconnected :-(');
@@ -166,20 +170,33 @@ export class Lesson1Page {
     {
       title: "Read Up",
       titleClass: "lesson-special-title",
-      description: "Here are some resources to get you started. <ul><li><a href='https://abass.co/blog/why-you-should-run-usability-testing-everything'>Why You should run Usability Testing on Everything</a></li><li><a href='https://www.ideo.com/news/informing-our-intuition-design-research-for-radical-innovation/'>Informing Our Intuition: Design Research for Radical Innovation</a></li><li><a href='https://abookapart.com/products/just-enough-research'>Just Enough Research</a></li></ul>",
+      description: "Here are some resources to get you started.",
+      links: [
+        {
+          title: "Why You should run Usability Testing on Everything",
+          href: "https://abass.co/blog/why-you-should-run-usability-testing-everything"
+        },
+        {
+          title: "Informing Our Intuition: Design Research for Radical Innovation",
+          href: "https://www.ideo.com/news/informing-our-intuition-design-research-for-radical-innovation/"
+        },
+        {
+          title: "Just Enough Research",
+          href: "https://abookapart.com/products/just-enough-research"
+        }
+      ],
       specialImg: "assets/icons/readUp.png",
       lastCard: true,
     },
   ];
 
-
-
   goHome() {
     this.navCtrl.setRoot(HomePage);
   }
 
-  presentModal() {
+  presentModal(response) {
     let modal = this.modalCtrl.create(L1Q1ModalPage);
+    this.statement.questionAnswered("lesson1", "1", this.slideShow.getActiveIndex(), response, this.slidePercentage);
     modal.present();
     modal.onDidDismiss(data=>{
       //This is a listener which will get the data passed from modal when the modal's view controller is dismissed
@@ -196,20 +213,24 @@ export class Lesson1Page {
     //console.log('Current index is', currentIndex);
     this.slidePercentage = this.slideShow.getActiveIndex()/(this.slideShow.length() - 1) * 100;
     //console.log('Lesson Page: Slide Progress is ' + this.slidePercentage);
-    if(currentSlide.hasOwnProperty('videoId')) {
-      console.log(currentSlide['videoId']);
+    if(currentSlide && currentSlide.hasOwnProperty('videoId')) {
+      //console.log(currentSlide['videoId']);
 
       this.player.launchPlayer(currentSlide['videoId'], this.userEmail, this.userName);
-      console.log(this.player);
+      //console.log(this.player);
     }
     let data = {
       lesson1Progress: this.slidePercentage || 0,
     }
     this.events.publish('lessonProgress', data);
+    this.statement.lessonProgressed("lesson1", this.slideShow.getActiveIndex(), this.slideShow.length(), this.slidePercentage);
+
+    //Lock slideshow until answer question
     if(currentIndex === 11 && !this.completedQ1) {
       this.slideShow.lockSwipes(true);
     }
     this._storage.set('currentL1Slide', currentIndex);
+
     if(this.slideShow.isEnd()) {
       this.lessonComplete = true;
       //console.log(this.slideShow.isEnd());
@@ -217,9 +238,19 @@ export class Lesson1Page {
     }
   }
 
+  launchLink(url, title) {
+    this.statement.launchLink("lesson1", url, title);
+  }
+
+  lessonSlidesComplete() {
+    if (!this.lessonComplete) {
+      this.statement.completedLesson("lesson1", this.slidePercentage);
+    }
+  }
+
   ionViewWillEnter() {
     this._storage.get('currentL1Slide').then((val) => {
-      this.slideShow.slideTo(val, 0);
+      this.slideShow.slideTo(val, 500);
     });
   }
 
