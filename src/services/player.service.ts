@@ -24,6 +24,8 @@ export class PlayerService {
   authorName: string;
   authorEmail: string;
   lessonNum: string;
+  timeUpdater: any;
+  videoCurrentTime: number;
 
   constructor(public lrs: LRSService) {
     var tag = document.createElement('script');
@@ -94,17 +96,28 @@ export class PlayerService {
     var self = this;
     self.ytEmbeddedVideoID = 'http://www.youtube.com/watch?v=' + self.youtube.player.getVideoData()['video_id'];
     self.ytEmbeddedVideoTitle = self.youtube.player.getVideoData().title;
-    console.log([this.lastPlayer2Time, self.youtube.player.getCurrentTime()])
+    function updateTime() {
+      if(self.youtube.player.getCurrentTime) {
+        self.videoCurrentTime = self.youtube.player.getCurrentTime();
+      }
+    }
+
     switch (event.data) {
       case (window['YT'].PlayerState.PLAYING):
         self.videoPlayed(self.ytEmbeddedVideoTitle, self.ytEmbeddedVideoID, self.lessonNum);
+        self.timeUpdater = setInterval(updateTime, 1000);
+        console.log("played");
         break;
       case (window['YT'].PlayerState.PAUSED):
-        if (self.lastPlayer2State == window['YT'].PlayerState.PLAYING) {
-          self.videoWatched(this.lastPlayer2Time, self.youtube.player.getCurrentTime(), self.ytEmbeddedVideoTitle, self.ytEmbeddedVideoID, self.lessonNum)
+        if (self.lastPlayer2State == window['YT'].PlayerState.PLAYING && Math.abs(self.youtube.player.getCurrentTime() - self.videoCurrentTime) <= 2) {
+          self.videoWatched(self.lastPlayer2Time, self.youtube.player.getCurrentTime(), self.ytEmbeddedVideoTitle, self.ytEmbeddedVideoID, self.lessonNum);
+          console.log("watched");
         } else {
-          self.videoSkipped(this.lastPlayer2Time, self.youtube.player.getCurrentTime(), self.ytEmbeddedVideoTitle, self.ytEmbeddedVideoID, self.lessonNum)
+          console.log([self.lastPlayer2Time, self.youtube.player.getCurrentTime()])
+          self.videoSkipped(self.lastPlayer2Time, self.youtube.player.getCurrentTime(), self.ytEmbeddedVideoTitle, self.ytEmbeddedVideoID, self.lessonNum);
+          console.log("skipped");
         }
+        clearInterval(self.timeUpdater);
         break;
       case (window['YT'].PlayerState.ENDED):
         self.videoEnded(self.ytEmbeddedVideoTitle, self.ytEmbeddedVideoID, self.lessonNum);
@@ -112,7 +125,7 @@ export class PlayerService {
       case (window['YT'].PlayerState.UNSTARTED):
         break;
     }
-    self.lastPlayer2Time = self.youtube.player.getCurrentTime();
+    console.log(self.lastPlayer2Time);
     self.lastPlayer2State = event.data;
   }
 
@@ -148,7 +161,7 @@ export class PlayerService {
     },
   });
     console.log(videoTinCan);
-
+    self.lastPlayer2Time = self.youtube.player.getCurrentTime();
     /*self.lrs.lrs.saveStatement(
      videoTinCan,
      {
@@ -206,7 +219,7 @@ export class PlayerService {
         },
     });
     console.log(videoTinCan);
-
+    self.lastPlayer2Time = self.youtube.player.getCurrentTime();
     /*self.lrs.lrs.saveStatement(
       videoTinCan,
       {
@@ -266,7 +279,7 @@ export class PlayerService {
         },
     });
     console.log(videoTinCan);
-
+    self.lastPlayer2Time = self.youtube.player.getCurrentTime();
     /*self.lrs.lrs.saveStatement(
       videoTinCan,
       {
@@ -351,8 +364,10 @@ export class PlayerService {
   // time in the statement
   timeString(time): string {
     //expecting seconds
+    console.log(time);
     // multiply by 1000 because Date() requires milliseconds
     var date = new Date(time * 1000);
+    console.log(date);
     var hh = date.getUTCHours();
     var hhString = '';
     var mm = date.getUTCMinutes();
@@ -365,10 +380,22 @@ export class PlayerService {
     // you would uncomment the following line to get 12-hour (not 24) time
     // if (hh > 12) {hh = hh % 12;}
     // These lines ensure you have two-digits
-    if (hh < 10) {hhString = "0"+hh;}
-    if (mm < 10) {mmString = "0"+mm;}
-    if (ss < 10) {ssString = "0"+ss;}
+    if (hh < 10) {
+      hhString = "0"+hh;
+    } else {
+      hhString += hh;
+    }
+    if (mm < 10) {
+      mmString = "0"+mm;
+    } else {
+      mmString += mm;
+    }
+    if (ss < 10) {
+      ssString = "0"+ss;
+    } else {
+      ssString += ss;
+    }
     // This formats your string to HH:MM:SS
-    return hhString + ":" + mmString + ":" + ssString + ":" + msString;
+    return hhString + ":" + mmString + ":" + ssString;
   }
 }
