@@ -27,7 +27,8 @@ export class Lesson1Page {
     public player: PlayerService,
     public statement: StatementService) {
       //initialize your page here
-        this.statement.giveCreds(this.userName, this.userEmail, "Kristin Anthony", "kristin@knanthony.com");
+      this.statement.giveCreds(this.userName, this.userEmail, "Kristin Anthony", "kristin@knanthony.com");
+      this.player.giveCreds(this.userName, this.userEmail, "Kristin Anthony", "kristin@knanthony.com", "lesson1");
       // watch network for a disconnect
       this._network.onDisconnect().subscribe(() => {
         console.log('network was disconnected :-(');
@@ -216,7 +217,7 @@ export class Lesson1Page {
     if(currentSlide && currentSlide.hasOwnProperty('videoId')) {
       //console.log(currentSlide['videoId']);
 
-      this.player.launchPlayer(currentSlide['videoId'], this.userEmail, this.userName);
+      this.player.launchPlayer(currentSlide['videoId']);
       //console.log(this.player);
     }
     let data = {
