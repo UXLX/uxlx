@@ -8,6 +8,8 @@ import { InAppBrowser } from '@ionic-native/in-app-browser';
 export class StatementService {
   userEmail: string;
   userName: string;
+  authorName: string;
+  authorEmail: string;
 
   constructor(
     public platform: Platform,
@@ -15,9 +17,11 @@ export class StatementService {
     public iab: InAppBrowser) {
   }
 
-  giveCreds (name, email) {
+  giveCreds (name, email, authorName, authorEmail) {
     this.userName = name;
     this.userEmail = email;
+    this.authorName = authorName;
+    this.authorEmail = authorEmail;
   }
 
   // base url http://www.lxresearch.info/app/ux-lx-app/
@@ -48,9 +52,9 @@ export class StatementService {
         },
         "extensions": {
           "http://www.lxresearch.info/app/ux-lx-app/extension/lesson-progress": lessonProgress + "%",
-          "author": {
-            "name": "Kristin Anthony",
-            "mbox": "mailto:kristin@knanthony.com"
+          "http://www.lxresearch.info/app/ux-lx-app/extension/author": {
+            "name": this.authorName,
+            "mbox": "mailto:" + this.authorEmail
           },
         }
       },
@@ -85,9 +89,9 @@ export class StatementService {
         },
         "extensions": {
           "http://www.lxresearch.info/app/ux-lx-app/extension/lesson-progress": lessonProgress + "%",
-          "author": {
-            "name": "Kristin Anthony",
-            "mbox": "mailto:kristin@knanthony.com"
+          "http://www.lxresearch.info/app/ux-lx-app/extension/author": {
+            "name": this.authorName,
+            "mbox": "mailto:" + this.authorEmail
           },
         }
       },
@@ -124,9 +128,10 @@ export class StatementService {
       },
       "context": {
         "extensions": {
-          "author": {
-            "name": "Kristin Anthony",
-            "mbox": "mailto:kristin@knanthony.com"
+          "http://www.lxresearch.info/app/ux-lx-app/extension/lesson-progress": lessonProgress + "%",
+          "http://www.lxresearch.info/app/ux-lx-app/extension/author": {
+            "name": this.authorName,
+            "mbox": "mailto:" + this.authorEmail
           }
         }
       },

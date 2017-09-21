@@ -27,7 +27,7 @@ export class Lesson1Page {
     public player: PlayerService,
     public statement: StatementService) {
       //initialize your page here
-        this.statement.giveCreds(this.userName, this.userEmail);
+        this.statement.giveCreds(this.userName, this.userEmail, "Kristin Anthony", "kristin@knanthony.com");
       // watch network for a disconnect
       this._network.onDisconnect().subscribe(() => {
         console.log('network was disconnected :-(');
