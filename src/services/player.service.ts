@@ -85,10 +85,8 @@ export class PlayerService {
     }
   }
 
-  launchPlayer(id, userEmail, userName): void {
+  launchPlayer(id): void {
     this.youtube.videoId = id;
-    this.userEmail = userEmail;
-    this.userName = userName;
     this.setupPlayer();
   }
 
@@ -96,6 +94,7 @@ export class PlayerService {
     var self = this;
     self.ytEmbeddedVideoID = 'http://www.youtube.com/watch?v=' + self.youtube.player.getVideoData()['video_id'];
     self.ytEmbeddedVideoTitle = self.youtube.player.getVideoData().title;
+    console.log([this.lastPlayer2Time, self.youtube.player.getCurrentTime()])
     switch (event.data) {
       case (window['YT'].PlayerState.PLAYING):
         self.videoPlayed(self.ytEmbeddedVideoTitle, self.ytEmbeddedVideoID, self.lessonNum);
@@ -108,7 +107,7 @@ export class PlayerService {
         }
         break;
       case (window['YT'].PlayerState.ENDED):
-        self.videoEnded(self.ytEmbeddedVideoTitle, self.ytEmbeddedVideoID, self.userEmail, self.userName);
+        self.videoEnded(self.ytEmbeddedVideoTitle, self.ytEmbeddedVideoID, self.lessonNum);
         break;
       case (window['YT'].PlayerState.UNSTARTED):
         break;
@@ -121,8 +120,8 @@ export class PlayerService {
     var self = this;
     const videoTinCan = new TinCan.Statement({
     "actor": {
-       name: self.userName,
-       mbox: self.userEmail,
+      name: self.userName,
+      mbox: self.userEmail,
     },
     "verb": {
        id: "http://activitystrea.ms/schema/1.0/play",
@@ -352,7 +351,7 @@ export class PlayerService {
   // time in the statement
   timeString(time): string {
     //expecting seconds
-    // multiply by 1000 because Date() requires miliseconds
+    // multiply by 1000 because Date() requires milliseconds
     var date = new Date(time * 1000);
     var hh = date.getUTCHours();
     var hhString = '';
