@@ -1,109 +1,109 @@
 {
-  "name": "uxLX",
-  "version": "0.0.1",
-  "author": "Ionic Framework",
-  "homepage": "http://ionicframework.com/",
-  "private": true,
-  "scripts": {
-    "clean": "ionic-app-scripts clean",
-    "build": "ionic-app-scripts build",
-    "lint": "ionic-app-scripts lint",
-    "ionic:build": "ionic-app-scripts build",
-    "ionic:serve": "ionic-app-scripts serve"
-  },
-  "dependencies": {
-    "@angular/common": "4.1.3",
-    "@angular/compiler": "4.1.3",
-    "@angular/compiler-cli": "4.1.3",
-    "@angular/core": "4.1.3",
-    "@angular/forms": "4.1.3",
-    "@angular/http": "4.1.3",
-    "@angular/platform-browser": "4.1.3",
-    "@angular/platform-browser-dynamic": "4.1.3",
-    "@ionic-native/core": "3.12.1",
-    "@ionic-native/google-plus": "^4.2.1",
-    "@ionic-native/in-app-browser": "^4.2.1",
-    "@ionic-native/network": "^4.2.1",
-    "@ionic-native/screen-orientation": "^4.2.1",
-    "@ionic-native/splash-screen": "3.12.1",
-    "@ionic-native/status-bar": "3.12.1",
-    "@ionic-native/twitter-connect": "^4.2.1",
-    "@ionic/storage": "^2.0.1",
-    "angularfire2": "^4.0.0-rc.2",
-    "cordova-android": "^6.2.3",
-    "cordova-ios": "^4.4.0",
-    "cordova-plugin-add-swift-support": "^1.7.0",
-    "cordova-plugin-browsertab": "^0.2.0",
-    "cordova-plugin-buildinfo": "^1.1.0",
-    "cordova-plugin-compat": "^1.1.0",
-    "cordova-plugin-console": "^1.0.5",
-    "cordova-plugin-customurlscheme": "^4.3.0",
-    "cordova-plugin-device": "^1.1.4",
-    "cordova-plugin-googleplus": "^5.1.1",
-    "cordova-plugin-inappbrowser": "^1.7.1",
-    "cordova-plugin-ionic": "^1.1.8",
-    "cordova-plugin-network-information": "^1.3.3",
-    "cordova-plugin-screen-orientation": "^2.0.1",
-    "cordova-plugin-splashscreen": "^4.0.3",
-    "cordova-plugin-statusbar": "^2.2.2",
-    "cordova-plugin-whitelist": "^1.3.1",
-    "cordova-sqlite-storage": "^2.0.4",
-    "cordova-universal-links-plugin": "git+https://github.com/aramando/cordova-universal-links-plugin.git#35b3ed7e9a0310b12f1ac92a5159b21ce50eee57",
-    "es6-promise-plugin": "git+https://github.com/vstirbu/PromisesPlugin.git",
-    "firebase": "^4.3.1",
-    "ionic-angular": "3.6.0",
-    "ionic-plugin-keyboard": "^2.2.1",
-    "ionicons": "3.0.0",
-    "ng-youtube-embed": "^1.7.10",
-    "rxjs": "5.4.0",
-    "sw-toolbox": "3.6.0",
-    "tincanjs": "^0.50.0",
-    "twitter-connect-plugin": "^0.6.0",
-    "zone.js": "0.8.12"
-  },
-  "devDependencies": {
-    "@ionic/app-scripts": "2.1.3",
-    "typescript": "2.3.4"
-  },
-  "description": "An Ionic project",
-  "cordova": {
-    "plugins": {
-      "cordova-sqlite-storage": {},
-      "cordova-plugin-screen-orientation": {},
-      "cordova-plugin-console": {},
-      "cordova-plugin-device": {},
-      "cordova-plugin-splashscreen": {},
-      "cordova-plugin-statusbar": {},
-      "cordova-plugin-whitelist": {},
-      "ionic-plugin-keyboard": {},
-      "cordova-plugin-network-information": {},
-      "cordova-plugin-ionic": {
-        "APP_ID": "d3310808",
-        "CHANNEL_NAME": "Master",
-        "UPDATE_METHOD": "background",
-        "UPDATE_API": "https://api.ionicjs.com",
-        "MAX_STORE": "2"
-      },
-      "cordova-plugin-inappbrowser": {},
-      "cordova-plugin-buildinfo": {},
-      "cordova-plugin-browsertab": {},
-      "cordova-universal-links-plugin": {},
-      "cordova-plugin-customurlscheme": {
-        "URL_SCHEME": "io.ionic.uxlx",
-        "ANDROID_SCHEME": " ",
-        "ANDROID_HOST": " ",
-        "ANDROID_PATHPREFIX": "/"
-      },
-      "cordova-plugin-googleplus": {
-        "REVERSED_CLIENT_ID": "com.googleusercontent.apps.919887709507-11gl2nj4e10bip4ufu6ip3f8g2qm3gd8"
-      },
-      "twitter-connect-plugin": {
-        "FABRIC_KEY": "fd80c4f311294ab8590b2e0a7173ab91a3424443"
-      }
+    "name": "uxLX",
+    "version": "0.0.1",
+    "author": "Ionic Framework",
+    "homepage": "http://ionicframework.com/",
+    "private": true,
+    "scripts": {
+        "clean": "ionic-app-scripts clean",
+        "build": "ionic-app-scripts build",
+        "lint": "ionic-app-scripts lint",
+        "ionic:build": "ionic-app-scripts build",
+        "ionic:serve": "ionic-app-scripts serve"
     },
-    "platforms": [
-      "android",
-      "ios"
-    ]
-  }
+    "dependencies": {
+        "@angular/common": "4.1.3",
+        "@angular/compiler": "4.1.3",
+        "@angular/compiler-cli": "4.1.3",
+        "@angular/core": "4.1.3",
+        "@angular/forms": "4.1.3",
+        "@angular/http": "4.1.3",
+        "@angular/platform-browser": "4.1.3",
+        "@angular/platform-browser-dynamic": "4.1.3",
+        "@ionic-native/core": "3.12.1",
+        "@ionic-native/google-plus": "^4.2.1",
+        "@ionic-native/in-app-browser": "^4.2.1",
+        "@ionic-native/network": "^4.2.1",
+        "@ionic-native/screen-orientation": "^4.2.1",
+        "@ionic-native/splash-screen": "3.12.1",
+        "@ionic-native/status-bar": "3.12.1",
+        "@ionic-native/twitter-connect": "^4.2.1",
+        "@ionic/storage": "^2.0.1",
+        "angularfire2": "^4.0.0-rc.2",
+        "cordova-android": "^6.2.3",
+        "cordova-ios": "^4.4.0",
+        "cordova-plugin-add-swift-support": "^1.7.0",
+        "cordova-plugin-browsertab": "^0.2.0",
+        "cordova-plugin-buildinfo": "^1.1.0",
+        "cordova-plugin-compat": "^1.1.0",
+        "cordova-plugin-console": "^1.0.5",
+        "cordova-plugin-customurlscheme": "^4.3.0",
+        "cordova-plugin-device": "^1.1.4",
+        "cordova-plugin-googleplus": "^5.1.1",
+        "cordova-plugin-inappbrowser": "^1.7.1",
+        "cordova-plugin-ionic": "^1.1.8",
+        "cordova-plugin-network-information": "^1.3.3",
+        "cordova-plugin-screen-orientation": "^2.0.1",
+        "cordova-plugin-splashscreen": "^4.0.3",
+        "cordova-plugin-statusbar": "^2.2.2",
+        "cordova-plugin-whitelist": "^1.3.1",
+        "cordova-sqlite-storage": "^2.0.4",
+        "cordova-universal-links-plugin": "git+https://github.com/aramando/cordova-universal-links-plugin.git#35b3ed7e9a0310b12f1ac92a5159b21ce50eee57",
+        "es6-promise-plugin": "git+https://github.com/vstirbu/PromisesPlugin.git",
+        "firebase": "^4.3.1",
+        "ionic-angular": "3.6.0",
+        "ionic-plugin-keyboard": "^2.2.1",
+        "ionicons": "3.0.0",
+        "ng-youtube-embed": "^1.7.10",
+        "rxjs": "5.4.0",
+        "sw-toolbox": "3.6.0",
+        "tincanjs": "^0.50.0",
+        "twitter-connect-plugin": "^0.6.0",
+        "zone.js": "0.8.12"
+    },
+    "devDependencies": {
+        "@ionic/app-scripts": "2.1.3",
+        "typescript": "2.3.4"
+    },
+    "description": "An Ionic project",
+    "cordova": {
+        "plugins": {
+            "cordova-sqlite-storage": {},
+            "cordova-plugin-screen-orientation": {},
+            "cordova-plugin-console": {},
+            "cordova-plugin-device": {},
+            "cordova-plugin-splashscreen": {},
+            "cordova-plugin-statusbar": {},
+            "cordova-plugin-whitelist": {},
+            "ionic-plugin-keyboard": {},
+            "cordova-plugin-network-information": {},
+            "cordova-plugin-ionic": {
+                "APP_ID": "d3310808",
+                "CHANNEL_NAME": "Master",
+                "UPDATE_METHOD": "background",
+                "UPDATE_API": "https://api.ionicjs.com",
+                "MAX_STORE": "2"
+            },
+            "cordova-plugin-inappbrowser": {},
+            "cordova-plugin-buildinfo": {},
+            "cordova-plugin-browsertab": {},
+            "cordova-universal-links-plugin": {},
+            "cordova-plugin-customurlscheme": {
+                "URL_SCHEME": "io.ionic.uxlx",
+                "ANDROID_SCHEME": " ",
+                "ANDROID_HOST": " ",
+                "ANDROID_PATHPREFIX": "/"
+            },
+            "cordova-plugin-googleplus": {
+                "REVERSED_CLIENT_ID": "com.googleusercontent.apps.919887709507-11gl2nj4e10bip4ufu6ip3f8g2qm3gd8"
+            },
+            "twitter-connect-plugin": {
+                "FABRIC_KEY": "fd80c4f311294ab8590b2e0a7173ab91a3424443"
+            }
+        },
+        "platforms": [
+            "android",
+            "ios"
+        ]
+    }
 }
