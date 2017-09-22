@@ -38,6 +38,7 @@ src/assets/
 src/assets/js/
 src/services/lrs.service.ts
 src/providers/auth/auth.ts
+config.xml
 www/
 $RECYCLE.BIN/
 
