@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
 import { Platform, NavController } from 'ionic-angular';
+import firebase from 'firebase';
+import { AngularFireAuth } from 'angularfire2/auth';
 import { HomePage } from '../home/home';
 import { Storage } from '@ionic/storage';
 
@@ -11,7 +13,8 @@ export class IntroPage {
   constructor(
     public navCtrl: NavController,
     public platform: Platform,
-    private _storage: Storage) {
+    public afAuth: AngularFireAuth,
+    private _storage: Storage,) {
       //initialize your page here
   }
   slides = [
@@ -33,8 +36,14 @@ export class IntroPage {
   ];
 
   goHome() {
-    this.navCtrl.setRoot(HomePage);
-    this._storage.set('hasSeenTutorial', true);
+    this.afAuth.authState.subscribe( user => {
+      if (user) {
+        this.navCtrl.setRoot(HomePage);
+      } else {
+        this.navCtrl.setRoot('LoginPage');
+      }
+      this._storage.set('hasSeenTutorial', true);
+    });
   }
 
 }

@@ -8,6 +8,12 @@
 
   <ion-content>
     <ion-list>
+      <ion-item *ngIf="userProfile">
+        <ion-avatar item-start>
+          <img [src]="userProfile.photoURL">
+        </ion-avatar>
+        <h2>Howdy, {{userProfile.displayName}}!</h2>
+      </ion-item>
       <button menuClose ion-item *ngFor="let p of pages" (click)="openPage(p)">
         {{p.title}}
       </button>

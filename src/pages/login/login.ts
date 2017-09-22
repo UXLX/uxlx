@@ -21,4 +21,9 @@ export class LoginPage {
     this.authProvider.googleLogin();
   }
 
+  twitterLogin(): void {
+    this.authProvider.twitterLogin();
+  }
+
+
 }

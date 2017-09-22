@@ -27,6 +27,7 @@
     "@ionic-native/screen-orientation": "^4.2.1",
     "@ionic-native/splash-screen": "3.12.1",
     "@ionic-native/status-bar": "3.12.1",
+    "@ionic-native/twitter-connect": "^4.2.1",
     "@ionic/storage": "^2.0.1",
     "angularfire2": "^4.0.0-rc.2",
     "cordova-android": "^6.2.3",
@@ -57,6 +58,7 @@
     "rxjs": "5.4.0",
     "sw-toolbox": "3.6.0",
     "tincanjs": "^0.50.0",
+    "twitter-connect-plugin": "^0.6.0",
     "zone.js": "0.8.12"
   },
   "devDependencies": {
@@ -94,6 +96,9 @@
       },
       "cordova-plugin-googleplus": {
         "REVERSED_CLIENT_ID": "com.googleusercontent.apps.919887709507-11gl2nj4e10bip4ufu6ip3f8g2qm3gd8"
+      },
+      "twitter-connect-plugin": {
+        "FABRIC_KEY": "fd80c4f311294ab8590b2e0a7173ab91a3424443"
       }
     },
     "platforms": [

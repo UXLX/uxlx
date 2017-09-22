@@ -244,9 +244,12 @@ export class Lesson1Page {
   }
 
   lessonSlidesComplete() {
-    if (!this.lessonComplete) {
-      this.statement.completedLesson("lesson1", this.slidePercentage);
-    }
+    this._storage.get('lesson1Complete').then((val) => {
+      if (!val) {
+        this.statement.completedLesson("lesson1", this.slidePercentage);
+      }
+    });
+
   }
 
   ionViewWillEnter() {

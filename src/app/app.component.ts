@@ -7,6 +7,7 @@ import { Storage } from '@ionic/storage';
 import TinCan from 'tincanjs';
 import { LRSService } from '../services/lrs.service';
 import { GooglePlus } from '@ionic-native/google-plus';
+import { TwitterConnect } from '@ionic-native/twitter-connect';
 import firebase from 'firebase';
 import { AngularFireAuth } from 'angularfire2/auth';
 
@@ -20,12 +21,16 @@ export class MyApp {
   @ViewChild(Nav) nav: Nav;
 
   rootPage: any = HomePage;
-  public userProfile:any = null;
+  public userProfile: any = null;
   initialStatement: any;
 
   pages: Array<{title: string, component: any}>;
   signOut(): firebase.Promise<any> {
-    return this.afAuth.auth.signOut();
+    let self = this;
+    return this.afAuth.auth.signOut().then(() => {
+      self._twitter.logout();
+      self._googlePlus.logout();
+    });
   }
 
   constructor(
@@ -36,6 +41,7 @@ export class MyApp {
     private _storage: Storage,
     private _screenOrientation: ScreenOrientation,
     private _googlePlus: GooglePlus,
+    private _twitter: TwitterConnect,
     public afAuth: AngularFireAuth) {
       // Check if the user has already seen the tutorial
       this._storage.get('hasSeenTutorial')
@@ -72,7 +78,7 @@ export class MyApp {
                 display: {'en-US': 'logged in to'}
             },
             "object": {
-              "id": "http://example.com/activities/ux-lx-app",
+              "id": "http://www.lxresearch.info/app/ux-lx-app/",
                 "definition": {
                   "type": "http://activitystrea.ms/schema/1.0/application",
                   "name": { "en-US": "UX + LX app" }
@@ -120,7 +126,13 @@ export class MyApp {
   openPage(page) {
     // Reset the content nav to have just this page
     // we wouldn't want the back button to show in this scenario
-    this.nav.setRoot(page.component);
+    this.afAuth.authState.subscribe( user => {
+      if (page.title === "Home" && user || page.title !== "Home") {
+        this.nav.setRoot(page.component);
+      } else if  (page.title === "Home" && !user) {
+        this.nav.setRoot('LoginPage');
+      }
+    });
   }
 
 
