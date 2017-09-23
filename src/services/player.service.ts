@@ -13,7 +13,6 @@ export class PlayerService {
     playerHeight: '360',
     playerWidth: '640'
   };
-  youTubeEmbeddedplayer: any;
   videoTinCan: any;
   ytEmbeddedVideoID: string;
   ytEmbeddedVideoTitle: string;
@@ -48,7 +47,9 @@ export class PlayerService {
   };
 
   createPlayer(): void {
-    return new window['YT'].Player(this.youtube.playerId, {
+    console.log("create new player");
+    var video;
+    video = new window['YT'].Player(this.youtube.playerId, {
       height: this.youtube.playerHeight,
       width: this.youtube.playerWidth,
       playerVars: {
@@ -60,6 +61,8 @@ export class PlayerService {
         "onStateChange": this.onPlayerStateChange.bind(this)
       }
     });
+    console.log(video);
+    return video;
   }
 
   loadPlayer(): void {
@@ -71,25 +74,28 @@ export class PlayerService {
     }
   }
 
-  setupPlayer() {
+  setupPlayer(playerId) {
     //we need to check if the api is loaded
     window['onYouTubeIframeAPIReady'] = () => {
       if (window['YT']) {
         this.youtube.ready = true;
-        this.bindPlayer('youTubeIframe');
+        console.log(this.youtube.ready);
+        this.bindPlayer(playerId);
         this.loadPlayer();
       }
     };
     if (window['YT'] && window['YT'].Player) {
       this.youtube.ready = true;
-      this.bindPlayer('youTubeIframe');
+      console.log(this.youtube.ready);
+      this.bindPlayer(playerId);
       this.loadPlayer();
     }
   }
 
-  launchPlayer(id): void {
-    this.youtube.videoId = id;
-    this.setupPlayer();
+  launchPlayer(videoId, playerId): void {
+    this.youtube.videoId = videoId;
+    // for multiple youtube videos to work, each playerId (div id) must be unique
+    this.setupPlayer(playerId);
   }
 
   onPlayerStateChange(event): void {
@@ -374,8 +380,6 @@ export class PlayerService {
     var mmString = '';
     var ss = date.getSeconds();
     var ssString = '';
-    var ms = date.getMilliseconds();
-    var msString = '';
     // If you were building a timestamp instead of a duration,
     // you would uncomment the following line to get 12-hour (not 24) time
     // if (hh > 12) {hh = hh % 12;}

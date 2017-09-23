@@ -4,14 +4,14 @@ import { Lesson1Page } from '../lesson1/lesson1';
 import { Lesson2Page } from '../lesson2/lesson2';
 import { Storage } from '@ionic/storage';
 import TinCan from 'tincanjs';
-import { LRSService } from '../../services/lrs.service';
+import { StatementService } from '../../services/statementgen.service';
 import firebase from 'firebase';
 import { AngularFireAuth } from 'angularfire2/auth';
 
 @Component({
   selector: 'page-home',
   templateUrl: 'home.html',
-  providers: [LRSService],
+  providers: [StatementService],
 })
 export class HomePage {
   getUpdatedProgress: any;
@@ -27,7 +27,7 @@ export class HomePage {
   public platform: Platform,
   public navParams: NavParams,
   public events: Events,
-  public lrs: LRSService,
+  public statement: StatementService,
   public afAuth: AngularFireAuth,
   private _storage: Storage) {
     this.loadProgress();
@@ -35,6 +35,7 @@ export class HomePage {
     afAuth.authState.subscribe( user => {
       if (user) {
         this.userProfile = user;
+        this.statement.giveCreds(this.userProfile.displayName, this.userProfile.email, "Kristin Anthony", "kristin@knanthony.com");
       }
     });
   }
@@ -49,39 +50,8 @@ export class HomePage {
     });
   };
 
-  launchedLesson (lessonTitle, lessonNum, lessonProgress) {
-    var launchLesson = new TinCan.Statement({
-      "actor": {
-          name: this.userProfile.displayName,
-          mbox: this.userProfile.email,
-      },
-      "verb": {
-          id: "http://adlnet.gov/expapi/verbs/launched",
-          display: {'en-US': 'launched'}
-      },
-      "object": {
-        "id": "http://example.com/activities/ux-lx-app",
-        "definition": {
-          "type": "http://adlnet.gov/expapi/activities/course",
-          "name": { "en-US": lessonTitle },
-          "extensions": {
-            "http://example.com/extension/lesson-progress": lessonProgress + "%"
-          }
-        },
-      },
-      "context": {
-        "author": {
-          "name": "Kristin Anthony",
-          "mbox": "mailto:kristin@knanthony.com"
-        }
-      },
-    });
-
-    console.log(launchLesson);
-  }
-
   lessonOne() {
-    this.launchedLesson("Lesson 1: What is UX and Why do I Need it?", "lesson1", this.lesson1Progress);
+    this.statement.launchedLesson("Lesson 1: What is UX and Why do I Need it?", "lesson1", this.lesson1Progress);
     this.navCtrl.setRoot(Lesson1Page, {
       userName: this.userProfile.displayName,
       userEmail: this.userProfile.email,
@@ -89,7 +59,11 @@ export class HomePage {
   }
 
   lessonTwo() {
-    this.navCtrl.setRoot(Lesson2Page)
+    this.statement.launchedLesson("Lesson 2: Which One's Which?", "lesson2", this.lesson2Progress);
+    this.navCtrl.setRoot(Lesson2Page, {
+      userName: this.userProfile.displayName,
+      userEmail: this.userProfile.email,
+    });
   }
 
   ionViewDidLoad(){

@@ -26,6 +26,44 @@ export class StatementService {
 
   // base url http://www.lxresearch.info/app/ux-lx-app/
 
+  launchedLesson (lessonTitle, lessonNum, lessonProgress) {
+    if (isNaN(lessonProgress)) {
+      lessonProgress = 0;
+    }
+    var launchLesson = new TinCan.Statement({
+      "actor": {
+        name: this.userName,
+        mbox: this.userEmail,
+      },
+      "verb": {
+          id: "http://adlnet.gov/expapi/verbs/launched",
+          display: {'en-US': 'launched'}
+      },
+      "object": {
+        "id": "http://www.lxresearch.info/app/ux-lx-app/" + lessonNum,
+        "definition": {
+          "type": "http://adlnet.gov/expapi/activities/course",
+          "name": { "en-US": lessonTitle },
+        },
+      },
+      "context": {
+        "contextActivities": {
+          "parent": {
+            "id": "http://www.lxresearch.info/app/ux-lx-app/" + lessonNum
+          },
+        },
+        "extensions": {
+          "http://www.lxresearch.info/app/ux-lx-app/extension/lesson-progress": lessonProgress + "%",
+          "http://www.lxresearch.info/app/ux-lx-app/extension/author": {
+            "name": this.authorName,
+            "mbox": "mailto:" + this.authorEmail
+          },
+        }
+      },
+    });
+    console.log(launchLesson);
+  }
+
   lessonProgressed (lessonNum, slideNum, slideTotal, lessonProgress) {
     // lessonNum should be in the form of "lesson1"; slideNum should be in the form of "1"
     var lessonProgress = new TinCan.Statement({
@@ -63,7 +101,7 @@ export class StatementService {
     console.log(lessonProgress);
   }
 
-  questionAnswered (lessonNum, questionNum, slideNum, answerChosen, lessonProgress) {
+  questionAnswered (lessonNum, questionNum, slideNum, answerChosen, isCorrect, lessonProgress) {
     // lessonNum should be in the form of "lesson1"; questionNum should be in the form of "1"
     var assessment = new TinCan.Statement({
       "actor": {
@@ -97,7 +135,7 @@ export class StatementService {
       },
       "result": {
         "completion": true,
-        "success": true,
+        "success": isCorrect,
         "response": answerChosen
       }
     });

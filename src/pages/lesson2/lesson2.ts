@@ -2,10 +2,12 @@ import { Component, ViewChild } from '@angular/core';
 import { Platform, NavController, NavParams, ModalController, ViewController, Slides, Events } from 'ionic-angular';
 import { HomePage } from '../home/home';
 import { Storage } from '@ionic/storage';
-import { Network } from '@ionic-native/network';
+import { PlayerService } from '../../services/player.service';
+import { StatementService } from '../../services/statementgen.service';
 
 @Component({
-  templateUrl: 'lesson2.html'
+  templateUrl: 'lesson2.html',
+  providers: [PlayerService, StatementService]
 })
 
 export class Lesson2Page {
@@ -18,19 +20,17 @@ export class Lesson2Page {
     public modalCtrl: ModalController,
     public events: Events,
     private _storage: Storage,
-    private _network: Network) {
+    public player: PlayerService,
+    public statement: StatementService,
+    private _navParams: NavParams) {
       //initialize your page here
-      // watch network for a disconnect
-      this._network.onDisconnect().subscribe(() => {
-        console.log('network was disconnected :-(');
-      });
-      this.platform.ready().then(() => {
-        // Now all cordova plugins are ready!
-        console.log(this._network.type);
-      });
+      this.statement.giveCreds(this.userName, this.userEmail, "Kristin Anthony", "kristin@knanthony.com");
+      this.player.giveCreds(this.userName, this.userEmail, "Kristin Anthony", "kristin@knanthony.com", "lesson2");
   }
   @ViewChild(Slides) slideShow: Slides;
   slidePercentage: number;
+  userEmail: string = this._navParams.get('userEmail');
+  userName: string = this._navParams.get('userName');
 
   slides = [
     {
@@ -123,12 +123,16 @@ export class Lesson2Page {
     {
       title: "",
       description: "<strong>Interviews:</strong> Go out and talk to people! This sounds a bit scary but even a short conversation (that you take notes about) might help your insight.",
-      videoUrl: "https://www.youtube.com/embed/8tiuWYs5Z-A?rel=0"
+      videoUrl: "https://www.youtube.com/embed/8tiuWYs5Z-A?rel=0?enablejsapi=1",
+      videoId: "8tiuWYs5Z-A",
+      playerId: "youTubeIframeLesson2Video1"
     },
     {
       title: "",
       description: "<strong>Field Observation:</strong> If you can manage it, it’s often useful to go out and see how people actually do their work. For example, shadowing a call center representative as they interact with customers can reveal all sorts of insights!",
-      videoUrl: "https://www.youtube.com/embed/XrpAveg7ZIg?rel=0"
+      videoUrl: "https://www.youtube.com/embed/XrpAveg7ZIg?rel=0?enablejsapi=1",
+      videoId: "XrpAveg7ZIg",
+      playerId: "youTubeIframeLesson2Video2"
     },
     {
       title: "Descriptive Research",
@@ -171,7 +175,9 @@ export class Lesson2Page {
     {
       title: "",
       description: "Evaluative research is typically associated with usability testing, the kind of testing that happens when you show and ask learners to interact with a solution you’ve come up with.",
-      videoUrl: "https://www.youtube.com/embed/PK-V66I9VgE?rel=0"
+      videoUrl: "https://www.youtube.com/embed/PK-V66I9VgE?rel=0?enablejsapi=1",
+      videoId: "PK-V66I9VgE",
+      playerId: "youTubeIframeLesson2Video3"
     },
     {
       title: "",
@@ -187,7 +193,9 @@ export class Lesson2Page {
     {
       title: "",
       description: "<strong>A/B Testing:</strong> A/B testing involves making a hypothesis that changing one part of your design will have an effect on users. For example, our ID Julia might want to test whether putting an alert at the top of the page would help users to scroll down to see the navigation.",
-      videoUrl: "https://www.youtube.com/embed/8H6QmMQWPEI?rel=0"
+      videoUrl: "https://www.youtube.com/embed/8H6QmMQWPEI?rel=0?enablejsapi=1",
+      videoId: "8H6QmMQWPEI",
+      playerId: "youTubeIframeLesson2Video4"
     },
     {
       title: "",
@@ -211,7 +219,21 @@ export class Lesson2Page {
     {
       title: "Read Up",
       titleClass: "lesson-special-title",
-      description: "We’ve only scratched the surface of UX research here. Check out these resources to learn more:<ul><li><a href='https://www.nngroup.com/articles/which-ux-research-methods/'>When to Use Which User-Experience Research Methods</a></li><li><a href='http://www.uxbooth.com/articles/complete-beginners-guide-to-design-research/'>Complete Beginner’s Guide to UX Research</a></li><li><a href='https://abookapart.com/products/just-enough-research'>Just Enough Research</a></li></ul>",
+      description: "We’ve only scratched the surface of UX research here. Check out these resources to learn more:",
+      links: [
+        {
+          title: "When to Use Which User-Experience Research Methods",
+          href: "https://www.nngroup.com/articles/which-ux-research-methods/"
+        },
+        {
+          title: "Complete Beginner’s Guide to UX Research",
+          href: "http://www.uxbooth.com/articles/complete-beginners-guide-to-design-research/"
+        },
+        {
+          title: "Just Enough Research",
+          href: "https://abookapart.com/products/just-enough-research"
+        }
+      ],
       specialImg: "assets/icons/readUp.png",
       lastCard: true,
     },
@@ -221,8 +243,9 @@ export class Lesson2Page {
     this.navCtrl.setRoot(HomePage);
   }
 
-  presentModal() {
+  presentModal(response, isCorrect) {
     let modal = this.modalCtrl.create(L2Q1ModalPage);
+    this.statement.questionAnswered("lesson2", "1", this.slideShow.getActiveIndex(), response, isCorrect, this.slidePercentage);
     modal.present();
     modal.onDidDismiss(data=>{
       //This is a listener which will get the data passed from modal when the modal's view controller is dismissed
@@ -232,8 +255,9 @@ export class Lesson2Page {
     })
   }
 
-  presentModal2() {
+  presentModal2(response, isCorrect) {
     let modal = this.modalCtrl.create(L2Q2ModalPage);
+    this.statement.questionAnswered("lesson2", "2", this.slideShow.getActiveIndex(), response, isCorrect, this.slidePercentage);
     modal.present();
     modal.onDidDismiss(data=>{
       //This is a listener which will get the data passed from modal when the modal's view controller is dismissed
@@ -245,26 +269,44 @@ export class Lesson2Page {
 
   getSlideProgress() {
     let currentIndex = this.slideShow.getActiveIndex();
-    //console.log('Current index is', currentIndex);
+    let currentSlide = this.slides[this.slideShow.getActiveIndex()];
+    // Get percentage completion
     this.slidePercentage = this.slideShow.getActiveIndex()/(this.slideShow.length() - 1) * 100;
-    //console.log('Lesson Page: Slide Progress is ' + this.slidePercentage);
+    // If slide has a video id, then launch the YouTube iframe API
+    if(currentSlide && currentSlide.hasOwnProperty('videoId')) {
+      this.player.launchPlayer(currentSlide['videoId'], currentSlide['playerId']);
+    }
     let data = {
       lesson2Progress: this.slidePercentage || 0,
     }
     this.events.publish('lesson2Progress', data);
+    this.statement.lessonProgressed("lesson2", this.slideShow.getActiveIndex(), this.slideShow.length(), this.slidePercentage);
+
+    // Lock slideshow until questions answered
     if(currentIndex === 7 && !this.completedL2Q1) {
       this.slideShow.lockSwipes(true);
     }
-
     if(currentIndex === 18 && !this.completedL2Q2) {
       this.slideShow.lockSwipes(true);
     }
+
     this._storage.set('currentL2Slide', currentIndex);
     if(this.slideShow.isEnd()) {
       this.lessonComplete = true;
-      //console.log(this.slideShow.isEnd());
       this._storage.set('lesson2Complete', true);
     }
+  }
+
+  launchLink(url, title) {
+    this.statement.launchLink("lesson1", url, title);
+  }
+
+  lessonSlidesComplete() {
+    this._storage.get('lesson2Complete').then((val) => {
+      if (!val) {
+        this.statement.completedLesson("lesson2", this.slidePercentage);
+      }
+    });
   }
 
   ionViewWillEnter() {
@@ -275,11 +317,9 @@ export class Lesson2Page {
 
   ionViewDidLoad() {
     this._storage.get('lesson2Q1Complete').then((val) => {
-      //console.log('Did you answer the question? ', val);
       this.completedL2Q1 = val;
     });
     this._storage.get('lesson2Q2Complete').then((val) => {
-      //console.log('Did you answer the question? ', val);
       this.completedL2Q2 = val;
     });
   }

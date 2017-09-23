@@ -10,7 +10,7 @@
 <ion-content class="lesson-page">
 
   <ion-slides pager paginationType="progress" (ionSlideDidChange)="getSlideProgress()" (ionSlideReachEnd)="lessonSlidesComplete()">
-    <ion-slide *ngFor="let slide of slides" >
+    <ion-slide *ngFor="let slide of slides">
       <div *ngIf="slide.image">
         <img [src]="slide.image" class="slide-image {{slide.imgClass}}"/>
       </div>
@@ -20,23 +20,23 @@
         <ion-icon *ngIf="completedQ1 && slide.choiceQuestion" name="checkmark-circle" class="check-icon"></ion-icon>
       </div>
       <div *ngIf="slide.videoUrl" class="intrinsic-container intrinsic-container-16x9">
-        <div id="youTubeIframe"></div>
+        <div id="{{slide.playerId}}"></div>
       </div>
-      <p [innerHTML]="slide.description | safe: 'html'" class="text-left"></p>
-        <ul *ngIf="slide.links" class="read-up-links">
-          <li *ngFor="let link of slide.links">
-            <a (click)="launchLink(link.href, link.title)">{{link.title}}</a>
-          </li>
-        </ul>
+      <p [innerHTML]="slide.description" class="text-left"></p>
+      <ul *ngIf="slide.links" class="read-up-links">
+        <li *ngFor="let link of slide.links">
+          <a (click)="launchLink(link.href, link.title)">{{link.title}}</a>
+        </li>
+      </ul>
       <div *ngIf="slide.choiceQuestion">
         <hr/>
         <ion-grid>
           <ion-row>
             <ion-col col-12 col-lg>
-              <button ion-button block color="light" class="choice" (click)="presentModal(slide.choice1)"><p class="text-wrap">{{slide.choice1}}</p></button>
+              <button ion-button block color="light" class="choice" (click)="presentModal(slide.choice1, true)"><p class="text-wrap">{{slide.choice1}}</p></button>
             </ion-col>
             <ion-col col-12 col-lg>
-              <button ion-button block color="light" class="choice" (click)="presentModal(slide.choice2)"><p class="text-wrap">{{slide.choice2}}</p></button>
+              <button ion-button block color="light" class="choice" (click)="presentModal(slide.choice2, true)"><p class="text-wrap">{{slide.choice2}}</p></button>
             </ion-col>
           </ion-row>
         </ion-grid>

@@ -2,10 +2,8 @@ import { Component, ViewChild } from '@angular/core';
 import { Platform, NavController, NavParams, ModalController, ViewController, Slides, Events } from 'ionic-angular';
 import { HomePage } from '../home/home';
 import { Storage } from '@ionic/storage';
-import { Network } from '@ionic-native/network';
 import { PlayerService } from '../../services/player.service';
 import { StatementService } from '../../services/statementgen.service';
-import { SafePipe } from '../../pipes/safepipe';
 
 @Component({
   templateUrl: 'lesson1.html',
@@ -22,21 +20,12 @@ export class Lesson1Page {
     public modalCtrl: ModalController,
     public events: Events,
     private _storage: Storage,
-    private _network: Network,
     private _navParams: NavParams,
     public player: PlayerService,
     public statement: StatementService) {
       //initialize your page here
       this.statement.giveCreds(this.userName, this.userEmail, "Kristin Anthony", "kristin@knanthony.com");
       this.player.giveCreds(this.userName, this.userEmail, "Kristin Anthony", "kristin@knanthony.com", "lesson1");
-      // watch network for a disconnect
-      this._network.onDisconnect().subscribe(() => {
-        console.log('network was disconnected :-(');
-      });
-      this.platform.ready().then(() => {
-        // Now all cordova plugins are ready!
-        console.log(this._network.type);
-      });
   }
   @ViewChild(Slides) slideShow: Slides;
   slidePercentage: number;
@@ -73,6 +62,7 @@ export class Lesson1Page {
       description: "The discipline of User Experience (UX) is about tackling those assumptions up front to build a better product.",
       videoUrl: "https://www.youtube.com/embed/Ovj4hFxko7c?rel=0?enablejsapi=1",
       videoId: "Ovj4hFxko7c",
+      playerId: "youTubeIframeLesson1Video1"
     },
     {
       title: "Ask Yourself",
@@ -195,9 +185,9 @@ export class Lesson1Page {
     this.navCtrl.setRoot(HomePage);
   }
 
-  presentModal(response) {
+  presentModal(response, isCorrect) {
     let modal = this.modalCtrl.create(L1Q1ModalPage);
-    this.statement.questionAnswered("lesson1", "1", this.slideShow.getActiveIndex(), response, this.slidePercentage);
+    this.statement.questionAnswered("lesson1", "1", this.slideShow.getActiveIndex(), response, isCorrect, this.slidePercentage);
     modal.present();
     modal.onDidDismiss(data=>{
       //This is a listener which will get the data passed from modal when the modal's view controller is dismissed
@@ -210,15 +200,11 @@ export class Lesson1Page {
   getSlideProgress() {
     let currentIndex = this.slideShow.getActiveIndex();
     let currentSlide = this.slides[this.slideShow.getActiveIndex()];
-
-    //console.log('Current index is', currentIndex);
+    // Get percentage completion
     this.slidePercentage = this.slideShow.getActiveIndex()/(this.slideShow.length() - 1) * 100;
-    //console.log('Lesson Page: Slide Progress is ' + this.slidePercentage);
+    // If slide has a video id, then launch the YouTube iframe API
     if(currentSlide && currentSlide.hasOwnProperty('videoId')) {
-      //console.log(currentSlide['videoId']);
-
-      this.player.launchPlayer(currentSlide['videoId']);
-      //console.log(this.player);
+      this.player.launchPlayer(currentSlide['videoId'], currentSlide['playerId']);
     }
     let data = {
       lesson1Progress: this.slidePercentage || 0,
@@ -234,7 +220,6 @@ export class Lesson1Page {
 
     if(this.slideShow.isEnd()) {
       this.lessonComplete = true;
-      //console.log(this.slideShow.isEnd());
       this._storage.set('lesson1Complete', true);
     }
   }
@@ -249,7 +234,6 @@ export class Lesson1Page {
         this.statement.completedLesson("lesson1", this.slidePercentage);
       }
     });
-
   }
 
   ionViewWillEnter() {
@@ -260,7 +244,6 @@ export class Lesson1Page {
 
   ionViewDidLoad() {
     this._storage.get('lesson1Q1Complete').then((val) => {
-      //console.log('Did you answer the question? ', val);
       this.completedQ1 = val;
     });
   }
