@@ -14,7 +14,7 @@ export class LoginPage {
   public authProvider: AuthProvider) {}
 
   ionViewDidLoad() {
-    console.log('ionViewDidLoad LoginPage');
+    //console.log('ionViewDidLoad LoginPage');
   }
 
   googleLogin(): void {

@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Events } from 'ionic-angular';
 import TinCan from 'tincanjs';
 import { LRSService } from './lrs.service';
 
@@ -25,13 +26,51 @@ export class PlayerService {
   lessonNum: string;
   timeUpdater: any;
   videoCurrentTime: number;
+  audioLastTime: number;
+  audioCurrentTime: number;
 
-  constructor(public lrs: LRSService) {
+  constructor(
+    public lrs: LRSService,
+    public events: Events) {
     var tag = document.createElement('script');
     tag.src = "https://www.youtube.com/iframe_api";
     var firstScriptTag = document.getElementsByTagName('script')[0];
     firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
     //this.setupPlayer();
+    let that = this;
+    this.events.subscribe('podcastEpisodeLoaded', function(episode) {
+      // From: https://github.com/devgeeks/ExampleHTML5AudioStreaming/blob/master/www/scripts/html5audio.js
+      console.log(episode);
+      // audio includes: onplay, onpause, onseeked, onended, currentTime
+      // audioTitle, audioUrl, podcastTitle, podcastEpisodeNum, podcastAuthor
+      episode.audio.nativeElement.onplay = ()=> {
+        that.podcastPlayed(episode.name, episode.episodeLink, episode.podcastName, episode.episodeNum, episode.podcastHost);
+        let s = episode.audio.nativeElement.currentTime % 60;
+        that.audioLastTime = s;
+      };
+      episode.audio.nativeElement.timeupdate = ()=> {
+        let s = episode.audio.nativeElement.currentTime % 60;
+        if (!episode.audio.nativeElement.paused && episode.audio.nativeElement.currentTime > 0) {
+          that.audioCurrentTime = s;
+        }
+        console.log(that.audioCurrentTime);
+		  }
+
+      episode.audio.nativeElement.onpause = ()=> {
+        let s = episode.audio.nativeElement.currentTime % 60;
+        that.audioCurrentTime = s;
+        that.podcastPaused(that.audioLastTime, that.audioCurrentTime, episode.name, episode.episodeLink, episode.podcastName, episode.episodeNum, episode.podcastHost);
+      };
+
+      episode.audio.nativeElement.onseeked = ()=> {
+        let s = episode.audio.nativeElement.currentTime % 60;
+        that.audioCurrentTime = s;
+        that.podcastSeeked(that.audioLastTime, that.audioCurrentTime, episode.name, episode.episodeLink, episode.podcastName, episode.episodeNum, episode.podcastHost);
+      };
+      episode.audio.nativeElement.onended = ()=> {
+        that.podcastEnded(episode.name, episode.episodeLink, episode.podcastName, episode.episodeNum, episode.podcastHost);
+      };
+    });
   }
 
   giveCreds (name, email, authorName, authorEmail, lessonNum) {
@@ -47,7 +86,6 @@ export class PlayerService {
   };
 
   createPlayer(): void {
-    console.log("create new player");
     var video;
     video = new window['YT'].Player(this.youtube.playerId, {
       height: this.youtube.playerHeight,
@@ -61,7 +99,6 @@ export class PlayerService {
         "onStateChange": this.onPlayerStateChange.bind(this)
       }
     });
-    console.log(video);
     return video;
   }
 
@@ -79,14 +116,12 @@ export class PlayerService {
     window['onYouTubeIframeAPIReady'] = () => {
       if (window['YT']) {
         this.youtube.ready = true;
-        console.log(this.youtube.ready);
         this.bindPlayer(playerId);
         this.loadPlayer();
       }
     };
     if (window['YT'] && window['YT'].Player) {
       this.youtube.ready = true;
-      console.log(this.youtube.ready);
       this.bindPlayer(playerId);
       this.loadPlayer();
     }
@@ -111,17 +146,17 @@ export class PlayerService {
     switch (event.data) {
       case (window['YT'].PlayerState.PLAYING):
         self.videoPlayed(self.ytEmbeddedVideoTitle, self.ytEmbeddedVideoID, self.lessonNum);
+        // use interval to check time every second;
+        // helps to accurately check difference between time before skip and current time
         self.timeUpdater = setInterval(updateTime, 1000);
-        console.log("played");
         break;
       case (window['YT'].PlayerState.PAUSED):
+        // If the video was playing and the difference between the last time and the current time is less than or equal to 2 seconds
+        // then assume that the user watched the video
         if (self.lastPlayer2State == window['YT'].PlayerState.PLAYING && Math.abs(self.youtube.player.getCurrentTime() - self.videoCurrentTime) <= 2) {
           self.videoWatched(self.lastPlayer2Time, self.youtube.player.getCurrentTime(), self.ytEmbeddedVideoTitle, self.ytEmbeddedVideoID, self.lessonNum);
-          console.log("watched");
         } else {
-          console.log([self.lastPlayer2Time, self.youtube.player.getCurrentTime()])
           self.videoSkipped(self.lastPlayer2Time, self.youtube.player.getCurrentTime(), self.ytEmbeddedVideoTitle, self.ytEmbeddedVideoID, self.lessonNum);
-          console.log("skipped");
         }
         clearInterval(self.timeUpdater);
         break;
@@ -131,7 +166,6 @@ export class PlayerService {
       case (window['YT'].PlayerState.UNSTARTED):
         break;
     }
-    console.log(self.lastPlayer2Time);
     self.lastPlayer2State = event.data;
   }
 
@@ -166,9 +200,9 @@ export class PlayerService {
       }
     },
   });
-    console.log(videoTinCan);
+    //console.log(videoTinCan);
     self.lastPlayer2Time = self.youtube.player.getCurrentTime();
-    /*self.lrs.lrs.saveStatement(
+    self.lrs.lrs.saveStatement(
      videoTinCan,
      {
         callback: function (err, xhr) {
@@ -186,7 +220,7 @@ export class PlayerService {
           // TOOO: do something with success (possibly ignore)
         }
       }
-    );*/
+    );
   }
 
   videoWatched(start, finish, videoTitle, videoUrl, lessonNum) {//start and finish in seconds
@@ -224,9 +258,9 @@ export class PlayerService {
           }
         },
     });
-    console.log(videoTinCan);
+    //console.log(videoTinCan);
     self.lastPlayer2Time = self.youtube.player.getCurrentTime();
-    /*self.lrs.lrs.saveStatement(
+    self.lrs.lrs.saveStatement(
       videoTinCan,
       {
         callback: function (err, xhr) {
@@ -246,7 +280,7 @@ export class PlayerService {
           // TOOO: do something with success (possibly ignore)
         }
       }
-    );*/
+    );
   }
 
   videoSkipped(start, finish, videoTitle, videoUrl, lessonNum) {//start and finish in seconds
@@ -284,9 +318,9 @@ export class PlayerService {
           }
         },
     });
-    console.log(videoTinCan);
+    //console.log(videoTinCan);
     self.lastPlayer2Time = self.youtube.player.getCurrentTime();
-    /*self.lrs.lrs.saveStatement(
+    self.lrs.lrs.saveStatement(
       videoTinCan,
       {
         callback: function (err, xhr) {
@@ -306,7 +340,7 @@ export class PlayerService {
           // TOOO: do something with success (possibly ignore)
         }
       }
-    );*/
+    );
   }
 
   videoEnded(videoTitle, videoUrl, lessonNum) {
@@ -340,9 +374,8 @@ export class PlayerService {
         }
       },
    });
-   console.log(videoTinCan);
-
-   /*self.lrs.lrs.saveStatement(
+   //console.log(videoTinCan);
+   self.lrs.lrs.saveStatement(
      videoTinCan,
      {
        callback: function (err, xhr) {
@@ -362,18 +395,263 @@ export class PlayerService {
          // TOOO: do something with success (possibly ignore)
        }
      }
-   );*/
+   );
   }
 
+  podcastPlayed(audioTitle, audioUrl, podcastTitle, podcastEpisodeNum, podcastAuthor) {
+    var self = this;
+    const audioTinCan = new TinCan.Statement({
+      "actor": {
+        name: self.userName,
+        mbox: self.userEmail,
+      },
+      "verb": {
+         id: "http://activitystrea.ms/schema/1.0/play",
+         display: {'en-US': 'played'}
+      },
+      "object": {
+        id: audioUrl,
+        definition: {
+          name: { "en-US": audioTitle },
+          "extensions": {
+            "http://www.lxresearch.info/app/ux-lx-app/extension/podcast": {
+              "podcast": podcastTitle,
+              "podcastEpisode": podcastEpisodeNum,
+              "podcastHost": podcastAuthor
+            }
+          }
+        },
+      },
+      "context": {
+        "contextActivities": {
+          "parent": {
+            "id": "http://www.lxresearch.info/app/ux-lx-app/" + self.lessonNum
+          },
+        },
+        "extensions": {
+          "http://www.lxresearch.info/app/ux-lx-app/extension/author": {
+            "name": self.authorName,
+            "mbox": "mailto:" + self.authorEmail
+          }
+        }
+      },
+    });
+    //console.log(audioTinCan);
+    self.lrs.lrs.saveStatement(
+     audioTinCan,
+     {
+        callback: function (err, xhr) {
+          if (err !== null) {
+            if (xhr !== null) {
+             console.log("Failed to save statement: " + xhr.responseText + " (" + xhr.status + ")");
+             // TODO: do something with error, didn't save statement
+             return;
+            }
+           console.log("Failed to save statement: " + err);
+           // TODO: do something with error, didn't save statement
+           return;
+          }
+          console.log("Statement saved");
+          // TOOO: do something with success (possibly ignore)
+        }
+      }
+    );
+  }
+
+  podcastPaused(start, finish, audioTitle, audioUrl, podcastTitle, podcastEpisodeNum, podcastAuthor) {//start and finish in seconds
+    var self = this;
+    const audioTinCan = new TinCan.Statement({
+      "actor": {
+        name: self.userName,
+        mbox: self.userEmail,
+      },
+      "verb": {
+        id: "http://activitystrea.ms/schema/1.0/play",
+        display: {'en-US': 'played'}
+      },
+      "object": {
+        id: audioUrl,
+        definition: {
+          name: { "en-US": audioTitle + " from " + self.timeString(start) + " to " + self.timeString(finish) },
+          "extensions": {
+            "http://id.tincanapi.com/extension/starting-point": self.timeString(start),
+            "http://id.tincanapi.com/extension/ending-point": self.timeString(finish),
+            "http://www.lxresearch.info/app/ux-lx-app/extension/podcast": {
+              "podcast": podcastTitle,
+              "podcastEpisode": podcastEpisodeNum,
+              "podcastHost": podcastAuthor
+            }
+          }
+        },
+      },
+      "context": {
+        "contextActivities": {
+          "parent": {
+            "id": "http://www.lxresearch.info/app/ux-lx-app/" + self.lessonNum
+          },
+        },
+        "extensions": {
+          "http://www.lxresearch.info/app/ux-lx-app/extension/author": {
+            "name": self.authorName,
+            "mbox": "mailto:" + self.authorEmail
+          },
+        }
+      },
+    });
+    //console.log(audioTinCan);
+    self.lrs.lrs.saveStatement(
+      audioTinCan,
+      {
+        callback: function (err, xhr) {
+          if (err !== null) {
+            if (xhr !== null) {
+              console.log("Failed to save statement: " + xhr.responseText + " (" + xhr.status + ")");
+              // TODO: do something with error, didn't save statement
+              return;
+            }
+
+            console.log("Failed to save statement: " + err);
+            // TODO: do something with error, didn't save statement
+            return;
+          }
+
+          console.log("Statement saved");
+          // TOOO: do something with success (possibly ignore)
+        }
+      }
+    );
+  }
+
+  podcastSeeked(start, finish, audioTitle, audioUrl, podcastTitle, podcastEpisodeNum, podcastAuthor) {//start and finish in seconds
+    var self = this;
+    const audioTinCan = new TinCan.Statement({
+      "actor": {
+        name: self.userName,
+        mbox: self.userEmail,
+      },
+      "verb": {
+        id: "http://id.tincanapi.com/verb/skipped",
+        display: {'en-US': 'skipped'}
+      },
+      "object": {
+        id: audioUrl,
+        definition: {
+          name: { "en-US": audioTitle + " from " + self.timeString(start) + " to " + self.timeString(finish) },
+          "extensions": {
+            "http://id.tincanapi.com/extension/starting-point": self.timeString(start),
+            "http://id.tincanapi.com/extension/ending-point": self.timeString(finish),
+            "http://www.lxresearch.info/app/ux-lx-app/extension/podcast": {
+              "podcast": podcastTitle,
+              "podcastEpisode": podcastEpisodeNum,
+              "podcastHost": podcastAuthor
+            }
+          }
+        },
+      },
+      "context": {
+        "contextActivities": {
+          "parent": {
+            "id": "http://www.lxresearch.info/app/ux-lx-app/" + self.lessonNum
+          },
+        },
+        "extensions": {
+          "http://www.lxresearch.info/app/ux-lx-app/extension/author": {
+            "name": self.authorName,
+            "mbox": "mailto:" + self.authorEmail
+          },
+        }
+      },
+    });
+    //console.log(audioTinCan);
+    self.lrs.lrs.saveStatement(
+      audioTinCan,
+      {
+        callback: function (err, xhr) {
+          if (err !== null) {
+            if (xhr !== null) {
+              console.log("Failed to save statement: " + xhr.responseText + " (" + xhr.status + ")");
+              // TODO: do something with error, didn't save statement
+              return;
+            }
+
+            console.log("Failed to save statement: " + err);
+            // TODO: do something with error, didn't save statement
+            return;
+          }
+
+          console.log("Statement saved");
+          // TOOO: do something with success (possibly ignore)
+        }
+      }
+    );
+  }
+
+  podcastEnded(audioTitle, audioUrl, podcastTitle, podcastEpisodeNum, podcastAuthor) {
+    var self = this;
+    const audioTinCan = new TinCan.Statement({
+      "actor": {
+        name: self.userName,
+        mbox: self.userEmail,
+      },
+      "verb": {
+        id: "http://activitystrea.ms/schema/1.0/complete",
+        display: {'en-US': 'finished playing'}
+      },
+      "object": {
+        id: audioUrl,
+        definition: {
+          name: { "en-US": audioTitle },
+          "extensions": {
+            "http://www.lxresearch.info/app/ux-lx-app/extension/podcast": {
+              "podcast": podcastTitle,
+              "podcastEpisode": podcastEpisodeNum,
+              "podcastHost": podcastAuthor
+            }
+          }
+        },
+      },
+      "context": {
+        "contextActivities": {
+          "parent": {
+            "id": "http://www.lxresearch.info/app/ux-lx-app/" + self.lessonNum
+          },
+        },
+        "extensions": {
+          "http://www.lxresearch.info/app/ux-lx-app/extension/author": {
+            "name": self.authorName,
+            "mbox": "mailto:" + self.authorEmail
+          }
+        }
+      },
+    });
+    //console.log(audioTinCan);
+    self.lrs.lrs.saveStatement(
+     audioTinCan,
+     {
+        callback: function (err, xhr) {
+          if (err !== null) {
+            if (xhr !== null) {
+             console.log("Failed to save statement: " + xhr.responseText + " (" + xhr.status + ")");
+             // TODO: do something with error, didn't save statement
+             return;
+            }
+           console.log("Failed to save statement: " + err);
+           // TODO: do something with error, didn't save statement
+           return;
+          }
+          console.log("Statement saved");
+          // TOOO: do something with success (possibly ignore)
+        }
+      }
+    );
+  }
 
   // This helper function helps to generate the human readable
   // time in the statement
   timeString(time): string {
     //expecting seconds
-    console.log(time);
     // multiply by 1000 because Date() requires milliseconds
     var date = new Date(time * 1000);
-    console.log(date);
     var hh = date.getUTCHours();
     var hhString = '';
     var mm = date.getUTCMinutes();

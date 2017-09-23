@@ -61,7 +61,26 @@ export class StatementService {
         }
       },
     });
-    console.log(launchLesson);
+    //console.log(launchLesson);
+    this.lrs.lrs.saveStatement(
+     launchLesson,
+     {
+        callback: function (err, xhr) {
+          if (err !== null) {
+            if (xhr !== null) {
+             console.log("Failed to save statement: " + xhr.responseText + " (" + xhr.status + ")");
+             // TODO: do something with error, didn't save statement
+             return;
+            }
+           console.log("Failed to save statement: " + err);
+           // TODO: do something with error, didn't save statement
+           return;
+          }
+          console.log("Statement saved");
+          // TOOO: do something with success (possibly ignore)
+        }
+      }
+    );
   }
 
   lessonProgressed (lessonNum, slideNum, slideTotal, lessonProgress) {
@@ -79,7 +98,7 @@ export class StatementService {
         "id": "http://www.lxresearch.info/app/ux-lx-app/" + lessonNum + "/slides/slide-" + slideNum,
         "definition": {
           "type": "http://id.tincanapi.com/activitytype/slide",
-          "name": { "en-US": "Slide " + slideNum + " of " + slideTotal },
+          "name": { "en-US": "Slide " + slideNum + " of " + slideTotal + " in " + lessonNum },
         },
       },
       "context": {
@@ -97,8 +116,26 @@ export class StatementService {
         }
       },
     });
-
-    console.log(lessonProgress);
+    //console.log(lessonProgress);
+    this.lrs.lrs.saveStatement(
+     lessonProgress,
+     {
+        callback: function (err, xhr) {
+          if (err !== null) {
+            if (xhr !== null) {
+             console.log("Failed to save statement: " + xhr.responseText + " (" + xhr.status + ")");
+             // TODO: do something with error, didn't save statement
+             return;
+            }
+           console.log("Failed to save statement: " + err);
+           // TODO: do something with error, didn't save statement
+           return;
+          }
+          console.log("Statement saved");
+          // TOOO: do something with success (possibly ignore)
+        }
+      }
+    );
   }
 
   questionAnswered (lessonNum, questionNum, slideNum, answerChosen, isCorrect, lessonProgress) {
@@ -116,7 +153,7 @@ export class StatementService {
         "id": "http://www.lxresearch.info/app/ux-lx-app/" + lessonNum + "/questions/question-" + questionNum,
         "definition": {
           "type": "http://activitystrea.ms/schema/1.0/question",
-          "name": { "en-US": "Question " + questionNum + " on Slide " + slideNum },
+          "name": { "en-US": "Question " + questionNum + " on Slide " + slideNum + " in " + lessonNum },
         },
       },
       "context": {
@@ -139,8 +176,26 @@ export class StatementService {
         "response": answerChosen
       }
     });
-
-    console.log(assessment);
+    //console.log(assessment);
+    this.lrs.lrs.saveStatement(
+     assessment,
+     {
+        callback: function (err, xhr) {
+          if (err !== null) {
+            if (xhr !== null) {
+             console.log("Failed to save statement: " + xhr.responseText + " (" + xhr.status + ")");
+             // TODO: do something with error, didn't save statement
+             return;
+            }
+           console.log("Failed to save statement: " + err);
+           // TODO: do something with error, didn't save statement
+           return;
+          }
+          console.log("Statement saved");
+          // TOOO: do something with success (possibly ignore)
+        }
+      }
+    );
   }
 
   completedLesson (lessonNum, lessonProgress) {
@@ -174,8 +229,26 @@ export class StatementService {
         }
       },
     });
-
-    console.log(completeLesson);
+    //console.log(completeLesson);
+    this.lrs.lrs.saveStatement(
+     completeLesson,
+     {
+        callback: function (err, xhr) {
+          if (err !== null) {
+            if (xhr !== null) {
+             console.log("Failed to save statement: " + xhr.responseText + " (" + xhr.status + ")");
+             // TODO: do something with error, didn't save statement
+             return;
+            }
+           console.log("Failed to save statement: " + err);
+           // TODO: do something with error, didn't save statement
+           return;
+          }
+          console.log("Statement saved");
+          // TOOO: do something with success (possibly ignore)
+        }
+      }
+    );
   }
 
   launchLink(lessonNum, url, title) {
@@ -204,12 +277,28 @@ export class StatementService {
         },
       }
     });
-
-    console.log(linkFire);
+    //console.log(linkFire);
+    this.lrs.lrs.saveStatement(
+     linkFire,
+     {
+        callback: function (err, xhr) {
+          if (err !== null) {
+            if (xhr !== null) {
+             console.log("Failed to save statement: " + xhr.responseText + " (" + xhr.status + ")");
+             // TODO: do something with error, didn't save statement
+             return;
+            }
+           console.log("Failed to save statement: " + err);
+           // TODO: do something with error, didn't save statement
+           return;
+          }
+          console.log("Statement saved");
+          // TOOO: do something with success (possibly ignore)
+        }
+      }
+    );
     this.platform.ready().then(() => {
       this.iab.create(url, "_system", "location=true");
     });
   }
-
-
 }

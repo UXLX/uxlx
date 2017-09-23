@@ -85,8 +85,7 @@ export class MyApp {
                 }
             },
         });
-        console.log(this.initialStatement);
-        /*
+        //console.log(this.initialStatement);
         this.lrs.lrs.saveStatement(
           this.initialStatement,
           {
@@ -105,7 +104,7 @@ export class MyApp {
               // TODO: do something with success (possibly ignore)
             }
           }
-        ); */
+        );
         this.nav.setRoot(HomePage);
       } else {
         this.nav.setRoot('LoginPage');

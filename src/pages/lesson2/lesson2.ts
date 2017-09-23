@@ -256,7 +256,10 @@ export class Lesson2Page {
   }
 
   presentModal2(response, isCorrect) {
-    let modal = this.modalCtrl.create(L2Q2ModalPage);
+    let modal = this.modalCtrl.create(L2Q2ModalPage, {
+      userName: this.userName,
+      userEmail: this.userEmail,
+    });
     this.statement.questionAnswered("lesson2", "2", this.slideShow.getActiveIndex(), response, isCorrect, this.slidePercentage);
     modal.present();
     modal.onDidDismiss(data=>{
@@ -380,20 +383,35 @@ export class L2Q1ModalPage {
     <ion-content class="lesson-page">
       <p class="modal-page">In this instance, it might be easy to assume that you have a training problem because you were told that it was, but by asking more questions and observing employees at work, you may find that what would be most helpful would be an interactive job aid that employees use for a period of several months that translated the old number into the new number. After typing in the new number over a period of time, the employees will have memorized it.</p>
       <p class="modal-page">You didn’t have a training problem at all, and doing descriptive research would help you to uncover that.</p>
-      <p>Check out the real-world inspiration for this scenario on the Dear Instructional Designer Podcast: <iframe frameborder='0' height='36px' scrolling='no' seamless src='https://simplecast.com/e/17c5013f?style=dark' width='100%'></iframe></p>
+      <p class="modal-page">Check out the real-world inspiration for this scenario on the Dear Instructional Designer Podcast: <br/><audio #dearIDEpisode43 controls="controls"> <source src="https://audio.simplecast.com/17c5013f.mp3" /></audio></p>
     </ion-content>
   `
 })
 
 export class L2Q2ModalPage {
   answered2Question: boolean = true;
-
+  userEmail: string = this._navParams.get('userEmail');
+  userName: string = this._navParams.get('userName');
   constructor(
     public platform: Platform,
-    public params: NavParams,
-    public viewCtrl: ViewController
+    public viewCtrl: ViewController,
+    public player: PlayerService,
+    public events: Events,
+    private _navParams: NavParams
   ) {
-
+    this.player.giveCreds(this.userName, this.userEmail, "Kristin Anthony", "kristin@knanthony.com", "lesson2");
+  }
+  @ViewChild('dearIDEpisode43') dearIDEpisode;
+  ionViewDidLoad() {
+    let episode = {
+      audio: this.dearIDEpisode,
+      name: "Episode 43: A Tale of Two Projects with Zsolt Olah",
+      episodeNum: 43,
+      podcastName: "Dear Instructional Designer",
+      podcastHost: "Kristin Anthony",
+      episodeLink: "https://dearinstructionaldesigner.simplecast.fm/episode-43-zsolt-olah",
+    };
+    this.events.publish("podcastEpisodeLoaded", episode);
   }
 
   dismiss() {
