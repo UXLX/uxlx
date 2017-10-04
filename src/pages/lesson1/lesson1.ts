@@ -187,19 +187,22 @@ export class Lesson1Page {
 
   presentModal(response, isCorrect) {
     let modal = this.modalCtrl.create(L1Q1ModalPage);
-    this.statement.questionAnswered("lesson1", "1", this.slideShow.getActiveIndex(), response, isCorrect, this.slidePercentage);
+    this.statement.questionAnswered("lesson1", "1", this.slideShow.getActiveIndex()+1, response, isCorrect, this.slidePercentage);
     modal.present();
     modal.onDidDismiss(data=>{
       //This is a listener which will get the data passed from modal when the modal's view controller is dismissed
       this.completedQ1 = data;
       this.slideShow.lockSwipes(false);
       this._storage.set('lesson1Q1Complete', data);
-    })
+    });
   }
 
   getSlideProgress() {
     let currentIndex = this.slideShow.getActiveIndex();
+    let currentSlideNum = this.slideShow.getActiveIndex() + 1;
     let currentSlide = this.slides[this.slideShow.getActiveIndex()];
+    // Clear interval for videos
+    this.player.clearUpdateTimer();
     // Get percentage completion
     this.slidePercentage = this.slideShow.getActiveIndex()/(this.slideShow.length() - 1) * 100;
     // If slide has a video id, then launch the YouTube iframe API
@@ -210,10 +213,10 @@ export class Lesson1Page {
       lesson1Progress: this.slidePercentage || 0,
     }
     this.events.publish('lessonProgress', data);
-    this.statement.lessonProgressed("lesson1", this.slideShow.getActiveIndex(), this.slideShow.length(), this.slidePercentage);
+    this.statement.lessonProgressed("lesson1", currentSlideNum, this.slideShow.length(), this.slidePercentage);
 
     //Lock slideshow until answer question
-    if(currentIndex === 11 && !this.completedQ1) {
+    if(currentSlideNum === 12 && !this.completedQ1) {
       this.slideShow.lockSwipes(true);
     }
     this._storage.set('currentL1Slide', currentIndex);
@@ -249,9 +252,13 @@ export class Lesson1Page {
   }
 
   ionSlideDidChange() {
-    console.log(this.slideShow.getActiveIndex());
+    //console.log(this.slideShow.getActiveIndex());
   }
 
+  ionViewWillLeave() {
+    // Clear interval for videos
+    this.player.clearUpdateTimer();
+  }
 }
 
 @Component({

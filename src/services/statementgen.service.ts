@@ -26,6 +26,183 @@ export class StatementService {
 
   // base url http://www.lxresearch.info/app/ux-lx-app/
 
+  launchApp() {
+    var initialStatement = new TinCan.Statement({
+        "actor": {
+          name: this.userName,
+          mbox: this.userEmail,
+        },
+        "verb": {
+            id: "https://brindlewaye.com/xAPITerms/verbs/loggedin/",
+            display: {'en-US': 'logged in to'}
+        },
+        "object": {
+          "id": "http://www.lxresearch.info/app/ux-lx-app/",
+            "definition": {
+              "type": "http://activitystrea.ms/schema/1.0/application",
+              "name": { "en-US": "UX + LX app" }
+            }
+        },
+    });
+    //console.log(initialStatement);
+    this.lrs.lrs.saveStatement(
+      initialStatement,
+      {
+        callback: function (err, xhr) {
+          if (err !== null) {
+            if (xhr !== null) {
+              console.log("Failed to save statement: " + xhr.responseText + " (" + xhr.status + ")");
+              // TODO: do something with error, didn't save statement
+              return;
+            }
+            console.log("Failed to save statement: " + err);
+            // TODO: do something with error, didn't save statement
+            return;
+          }
+          console.log("Statement saved");
+          // TODO: do something with success (possibly ignore)
+        }
+      }
+    );
+  }
+
+  launchOnboarding() {
+    var launchIntro = new TinCan.Statement({
+      "actor": {
+        name: this.userName,
+        mbox: this.userEmail,
+      },
+      "verb": {
+          id: "http://adlnet.gov/expapi/verbs/launched",
+          display: {'en-US': 'launched'}
+      },
+      "object": {
+        "id": "http://www.lxresearch.info/app/ux-lx-app/app-onboarding",
+        "definition": {
+          "type": "http://activitystrea.ms/schema/1.0/page",
+          "name": { "en-US": "App Onboarding" },
+        },
+      },
+    });
+    //console.log(launchIntro);
+    this.lrs.lrs.saveStatement(
+     launchIntro,
+     {
+        callback: function (err, xhr) {
+          if (err !== null) {
+            if (xhr !== null) {
+             console.log("Failed to save statement: " + xhr.responseText + " (" + xhr.status + ")");
+             // TODO: do something with error, didn't save statement
+             return;
+            }
+           console.log("Failed to save statement: " + err);
+           // TODO: do something with error, didn't save statement
+           return;
+          }
+          console.log("Statement saved");
+          // TOOO: do something with success (possibly ignore)
+        }
+      }
+    );
+  }
+
+  introProgressed (slideNum, slideTotal, introProgress) {
+    if (isNaN(introProgress)) {
+      introProgress = 0;
+    }
+    var launchIntro = new TinCan.Statement({
+      "actor": {
+        name: this.userName,
+        mbox: this.userEmail,
+      },
+      "verb": {
+        id: "http://id.tincanapi.com/verb/viewed",
+        display: {'en-US': 'viewed'}
+      },
+      "object": {
+        "id": "http://www.lxresearch.info/app/ux-lx-app/app-onboarding" + "/slides/slide-" + slideNum,
+        "definition": {
+          "type": "http://id.tincanapi.com/activitytype/slide",
+          "name": { "en-US": "Slide " + slideNum + " of " + slideTotal + " in App Onboarding" },
+        },
+      },
+      "context": {
+        "contextActivities": {
+          "parent": {
+            "id": "http://www.lxresearch.info/app/ux-lx-app/app-onboarding"
+          },
+        },
+        "extensions": {
+          "http://www.lxresearch.info/app/ux-lx-app/extension/intro-progress": introProgress + "%",
+          "http://www.lxresearch.info/app/ux-lx-app/extension/author": {
+            "name": this.authorName,
+            "mbox": "mailto:" + this.authorEmail
+          },
+        }
+      },
+    });
+    //console.log(launchIntro);
+    this.lrs.lrs.saveStatement(
+     launchIntro,
+     {
+        callback: function (err, xhr) {
+          if (err !== null) {
+            if (xhr !== null) {
+             console.log("Failed to save statement: " + xhr.responseText + " (" + xhr.status + ")");
+             // TODO: do something with error, didn't save statement
+             return;
+            }
+           console.log("Failed to save statement: " + err);
+           // TODO: do something with error, didn't save statement
+           return;
+          }
+          console.log("Statement saved");
+          // TOOO: do something with success (possibly ignore)
+        }
+      }
+    );
+  }
+
+  completedIntro (introProgress) {
+    var completeIntro = new TinCan.Statement({
+      "actor": {
+          name: this.userName,
+          mbox: this.userEmail,
+      },
+      "verb": {
+          id: "http://adlnet.gov/expapi/verbs/completed",
+          display: {'en-US': 'completed'}
+      },
+      "object": {
+        "id": "http://www.lxresearch.info/app/ux-lx-app/app-onboarding",
+        "definition": {
+          "type": "http://activitystrea.ms/schema/1.0/page",
+          "name": { "en-US": "App Onboarding" },
+        },
+      },
+    });
+    //console.log(completeIntro);
+    this.lrs.lrs.saveStatement(
+     completeIntro,
+     {
+        callback: function (err, xhr) {
+          if (err !== null) {
+            if (xhr !== null) {
+             console.log("Failed to save statement: " + xhr.responseText + " (" + xhr.status + ")");
+             // TODO: do something with error, didn't save statement
+             return;
+            }
+           console.log("Failed to save statement: " + err);
+           // TODO: do something with error, didn't save statement
+           return;
+          }
+          console.log("Statement saved");
+          // TOOO: do something with success (possibly ignore)
+        }
+      }
+    );
+  }
+
   launchedLesson (lessonTitle, lessonNum, lessonProgress) {
     if (isNaN(lessonProgress)) {
       lessonProgress = 0;

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Events } from 'ionic-angular';
+import { Platform, Events } from 'ionic-angular';
 import TinCan from 'tincanjs';
 import { LRSService } from './lrs.service';
 
@@ -19,17 +19,20 @@ export class PlayerService {
   ytEmbeddedVideoTitle: string;
   lastPlayer2Time: string;
   lastPlayer2State: string;
+  lastTime: number = -1;
   userEmail: string;
   userName: string;
   authorName: string;
   authorEmail: string;
   lessonNum: string;
+  start_count: number = 0;
   timeUpdater: any;
   videoCurrentTime: number;
   audioLastTime: number;
   audioCurrentTime: number;
 
   constructor(
+    public platform: Platform,
     public lrs: LRSService,
     public events: Events) {
     var tag = document.createElement('script');
@@ -37,40 +40,6 @@ export class PlayerService {
     var firstScriptTag = document.getElementsByTagName('script')[0];
     firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
     //this.setupPlayer();
-    let that = this;
-    this.events.subscribe('podcastEpisodeLoaded', function(episode) {
-      // From: https://github.com/devgeeks/ExampleHTML5AudioStreaming/blob/master/www/scripts/html5audio.js
-      console.log(episode);
-      // audio includes: onplay, onpause, onseeked, onended, currentTime
-      // audioTitle, audioUrl, podcastTitle, podcastEpisodeNum, podcastAuthor
-      episode.audio.nativeElement.onplay = ()=> {
-        that.podcastPlayed(episode.name, episode.episodeLink, episode.podcastName, episode.episodeNum, episode.podcastHost);
-        let s = episode.audio.nativeElement.currentTime % 60;
-        that.audioLastTime = s;
-      };
-      episode.audio.nativeElement.timeupdate = ()=> {
-        let s = episode.audio.nativeElement.currentTime % 60;
-        if (!episode.audio.nativeElement.paused && episode.audio.nativeElement.currentTime > 0) {
-          that.audioCurrentTime = s;
-        }
-        console.log(that.audioCurrentTime);
-		  }
-
-      episode.audio.nativeElement.onpause = ()=> {
-        let s = episode.audio.nativeElement.currentTime % 60;
-        that.audioCurrentTime = s;
-        that.podcastPaused(that.audioLastTime, that.audioCurrentTime, episode.name, episode.episodeLink, episode.podcastName, episode.episodeNum, episode.podcastHost);
-      };
-
-      episode.audio.nativeElement.onseeked = ()=> {
-        let s = episode.audio.nativeElement.currentTime % 60;
-        that.audioCurrentTime = s;
-        that.podcastSeeked(that.audioLastTime, that.audioCurrentTime, episode.name, episode.episodeLink, episode.podcastName, episode.episodeNum, episode.podcastHost);
-      };
-      episode.audio.nativeElement.onended = ()=> {
-        that.podcastEnded(episode.name, episode.episodeLink, episode.podcastName, episode.episodeNum, episode.podcastHost);
-      };
-    });
   }
 
   giveCreds (name, email, authorName, authorEmail, lessonNum) {
@@ -113,7 +82,7 @@ export class PlayerService {
 
   setupPlayer(playerId) {
     //we need to check if the api is loaded
-    window['onYouTubeIframeAPIReady'] = () => {
+    window['onYouTubeIframeAPIReady'] = ()=> {
       if (window['YT']) {
         this.youtube.ready = true;
         this.bindPlayer(playerId);
@@ -128,6 +97,8 @@ export class PlayerService {
   }
 
   launchPlayer(videoId, playerId): void {
+    this.lastTime = -1;
+    this.clearUpdateTimer();
     this.youtube.videoId = videoId;
     // for multiple youtube videos to work, each playerId (div id) must be unique
     this.setupPlayer(playerId);
@@ -137,36 +108,61 @@ export class PlayerService {
     var self = this;
     self.ytEmbeddedVideoID = 'http://www.youtube.com/watch?v=' + self.youtube.player.getVideoData()['video_id'];
     self.ytEmbeddedVideoTitle = self.youtube.player.getVideoData().title;
-    function updateTime() {
-      if(self.youtube.player.getCurrentTime) {
+    let updateTime = ()=> {
+      if(self.youtube.player.getCurrentTime && self.lastTime !== -1) {
+        if (Math.abs(self.youtube.player.getCurrentTime() - self.lastTime) >= 2) {
+          // console.log("seeked");
+          if (self.lastPlayer2State == window['YT'].PlayerState.PLAYING) {
+            self.videoSkipped(self.lastTime, self.youtube.player.getCurrentTime(), self.ytEmbeddedVideoTitle, self.ytEmbeddedVideoID, self.lessonNum);
+          } else {
+            self.videoSkipped(self.lastPlayer2Time, self.youtube.player.getCurrentTime(), self.ytEmbeddedVideoTitle, self.ytEmbeddedVideoID, self.lessonNum);
+          }
+        }
+      }
+      if(self.youtube.player.getCurrentTime && self.lastTime !== -1) {
         self.videoCurrentTime = self.youtube.player.getCurrentTime();
+      }
+
+      if(self.youtube.player.getCurrentTime) {
+        self.lastTime = self.youtube.player.getCurrentTime();
       }
     }
 
     switch (event.data) {
       case (window['YT'].PlayerState.PLAYING):
+        // console.log("playing");
         self.videoPlayed(self.ytEmbeddedVideoTitle, self.ytEmbeddedVideoID, self.lessonNum);
         // use interval to check time every second;
         // helps to accurately check difference between time before skip and current time
-        self.timeUpdater = setInterval(updateTime, 1000);
+        this.start_count+=1;
+        if(this.start_count==1){
+          self.timeUpdater = setInterval(updateTime, 1000);
+        }
         break;
       case (window['YT'].PlayerState.PAUSED):
         // If the video was playing and the difference between the last time and the current time is less than or equal to 2 seconds
         // then assume that the user watched the video
-        if (self.lastPlayer2State == window['YT'].PlayerState.PLAYING && Math.abs(self.youtube.player.getCurrentTime() - self.videoCurrentTime) <= 2) {
-          self.videoWatched(self.lastPlayer2Time, self.youtube.player.getCurrentTime(), self.ytEmbeddedVideoTitle, self.ytEmbeddedVideoID, self.lessonNum);
-        } else {
+        if (self.lastPlayer2State == window['YT'].PlayerState.PLAYING && Math.abs(self.youtube.player.getCurrentTime() - self.lastTime) <= 2) {
+          //console.log("paused");
+          self.videoPaused(self.lastPlayer2Time, self.youtube.player.getCurrentTime(), self.ytEmbeddedVideoTitle, self.ytEmbeddedVideoID, self.lessonNum);
+        } else if (!this.platform.is('cordova') && Math.abs(self.youtube.player.getCurrentTime() - self.lastTime) >= 2) {
+          //console.log("seeked");
           self.videoSkipped(self.lastPlayer2Time, self.youtube.player.getCurrentTime(), self.ytEmbeddedVideoTitle, self.ytEmbeddedVideoID, self.lessonNum);
         }
-        clearInterval(self.timeUpdater);
         break;
       case (window['YT'].PlayerState.ENDED):
         self.videoEnded(self.ytEmbeddedVideoTitle, self.ytEmbeddedVideoID, self.lessonNum);
+        this.clearUpdateTimer();
         break;
       case (window['YT'].PlayerState.UNSTARTED):
         break;
     }
     self.lastPlayer2State = event.data;
+  }
+
+  clearUpdateTimer() {
+    this.start_count=0;
+    window.clearInterval(this.timeUpdater);
   }
 
   videoPlayed(videoTitle, videoUrl, lessonNum) {
@@ -200,7 +196,7 @@ export class PlayerService {
       }
     },
   });
-    //console.log(videoTinCan);
+    //console.log(videoTinCan.target.definition.name);
     self.lastPlayer2Time = self.youtube.player.getCurrentTime();
     self.lrs.lrs.saveStatement(
      videoTinCan,
@@ -223,7 +219,7 @@ export class PlayerService {
     );
   }
 
-  videoWatched(start, finish, videoTitle, videoUrl, lessonNum) {//start and finish in seconds
+  videoPaused(start, finish, videoTitle, videoUrl, lessonNum) {//start and finish in seconds
     var self = this;
     const videoTinCan = new TinCan.Statement({
         "actor": {
@@ -231,13 +227,13 @@ export class PlayerService {
           mbox: self.userEmail,
         },
         "verb": {
-          id: "http://activitystrea.ms/schema/1.0/watch",
-          display: {'en-US': 'watched'}
+          id: "http://id.tincanapi.com/verb/paused",
+          display: {'en-US': 'paused'}
         },
         "object": {
           id: videoUrl,
           definition: {
-              name: { "en-US": videoTitle + " from " + self.timeString(start) + " to " + self.timeString(finish) },
+              name: { "en-US": videoTitle },
               extensions: {
                   "http://id.tincanapi.com/extension/starting-point": self.timeString(start),
                   "http://id.tincanapi.com/extension/ending-point": self.timeString(finish)
@@ -258,7 +254,7 @@ export class PlayerService {
           }
         },
     });
-    //console.log(videoTinCan);
+    //console.log([self.timeString(start), self.timeString(finish)]);
     self.lastPlayer2Time = self.youtube.player.getCurrentTime();
     self.lrs.lrs.saveStatement(
       videoTinCan,
@@ -297,7 +293,7 @@ export class PlayerService {
         "object": {
           id: videoUrl,
           definition: {
-            name: { "en-US": videoTitle + " from " + self.timeString(start) + " to " + self.timeString(finish) },
+            name: { "en-US": videoTitle },
             extensions: {
                 "http://id.tincanapi.com/extension/starting-point": self.timeString(start),
                 "http://id.tincanapi.com/extension/ending-point": self.timeString(finish)
@@ -318,7 +314,7 @@ export class PlayerService {
           }
         },
     });
-    //console.log(videoTinCan);
+    //console.log([self.timeString(start), self.timeString(finish)]);
     self.lastPlayer2Time = self.youtube.player.getCurrentTime();
     self.lrs.lrs.saveStatement(
       videoTinCan,
@@ -374,7 +370,7 @@ export class PlayerService {
         }
       },
    });
-   //console.log(videoTinCan);
+   //console.log(videoTinCan.target.definition.name);
    self.lrs.lrs.saveStatement(
      videoTinCan,
      {
@@ -466,13 +462,13 @@ export class PlayerService {
         mbox: self.userEmail,
       },
       "verb": {
-        id: "http://activitystrea.ms/schema/1.0/play",
-        display: {'en-US': 'played'}
+        id: "http://id.tincanapi.com/verb/paused",
+        display: {'en-US': 'paused'}
       },
       "object": {
         id: audioUrl,
         definition: {
-          name: { "en-US": audioTitle + " from " + self.timeString(start) + " to " + self.timeString(finish) },
+          name: { "en-US": audioTitle},
           "extensions": {
             "http://id.tincanapi.com/extension/starting-point": self.timeString(start),
             "http://id.tincanapi.com/extension/ending-point": self.timeString(finish),
@@ -536,7 +532,7 @@ export class PlayerService {
       "object": {
         id: audioUrl,
         definition: {
-          name: { "en-US": audioTitle + " from " + self.timeString(start) + " to " + self.timeString(finish) },
+          name: { "en-US": audioTitle },
           "extensions": {
             "http://id.tincanapi.com/extension/starting-point": self.timeString(start),
             "http://id.tincanapi.com/extension/ending-point": self.timeString(finish),

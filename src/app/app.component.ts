@@ -4,12 +4,11 @@ import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { ScreenOrientation } from '@ionic-native/screen-orientation';
 import { Storage } from '@ionic/storage';
-import TinCan from 'tincanjs';
-import { LRSService } from '../services/lrs.service';
 import { GooglePlus } from '@ionic-native/google-plus';
 import { TwitterConnect } from '@ionic-native/twitter-connect';
 import firebase from 'firebase';
 import { AngularFireAuth } from 'angularfire2/auth';
+import { StatementService } from '../services/statementgen.service';
 
 import { HomePage } from '../pages/home/home';
 import { IntroPage } from '../pages/intro/intro';
@@ -37,7 +36,7 @@ export class MyApp {
     public platform: Platform,
     public statusBar: StatusBar,
     public splashScreen: SplashScreen,
-    public lrs: LRSService,
+    public statement: StatementService,
     private _storage: Storage,
     private _screenOrientation: ScreenOrientation,
     private _googlePlus: GooglePlus,
@@ -68,44 +67,16 @@ export class MyApp {
         //user.email gets the email
         //console.log(user);
         this.userProfile = user;
-        this.initialStatement = new TinCan.Statement({
-            "actor": {
-                name: user.displayName,
-                mbox: user.email,
-            },
-            "verb": {
-                id: "https://brindlewaye.com/xAPITerms/verbs/loggedin/",
-                display: {'en-US': 'logged in to'}
-            },
-            "object": {
-              "id": "http://www.lxresearch.info/app/ux-lx-app/",
-                "definition": {
-                  "type": "http://activitystrea.ms/schema/1.0/application",
-                  "name": { "en-US": "UX + LX app" }
-                }
-            },
-        });
-        //console.log(this.initialStatement);
-        this.lrs.lrs.saveStatement(
-          this.initialStatement,
-          {
-            callback: function (err, xhr) {
-              if (err !== null) {
-                if (xhr !== null) {
-                  console.log("Failed to save statement: " + xhr.responseText + " (" + xhr.status + ")");
-                  // TODO: do something with error, didn't save statement
-                  return;
-                }
-                console.log("Failed to save statement: " + err);
-                // TODO: do something with error, didn't save statement
-                return;
-              }
-              console.log("Statement saved");
-              // TODO: do something with success (possibly ignore)
-            }
+        this.statement.giveCreds(this.userProfile.displayName, this.userProfile.email, "Kristin Anthony", "kristin@knanthony.com");
+        this.statement.launchApp();
+        this._storage.get('hasSeenTutorial').then((val) => {
+          if (!val) {
+            this.nav.setRoot(IntroPage);
+          } else {
+            this.nav.setRoot(HomePage);
           }
-        );
-        this.nav.setRoot(HomePage);
+        });
+
       } else {
         this.nav.setRoot('LoginPage');
       }
@@ -128,6 +99,9 @@ export class MyApp {
     this.afAuth.authState.subscribe( user => {
       if (page.title === "Home" && user || page.title !== "Home") {
         this.nav.setRoot(page.component);
+        if(page.title === "Getting Started" && user) {
+          this.statement.launchOnboarding();
+        }
       } else if  (page.title === "Home" && !user) {
         this.nav.setRoot('LoginPage');
       }

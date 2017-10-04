@@ -3,9 +3,7 @@ import { Platform, NavController, NavParams, Events } from 'ionic-angular';
 import { Lesson1Page } from '../lesson1/lesson1';
 import { Lesson2Page } from '../lesson2/lesson2';
 import { Storage } from '@ionic/storage';
-import TinCan from 'tincanjs';
 import { StatementService } from '../../services/statementgen.service';
-import firebase from 'firebase';
 import { AngularFireAuth } from 'angularfire2/auth';
 
 @Component({

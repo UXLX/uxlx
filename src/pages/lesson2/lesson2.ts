@@ -4,6 +4,7 @@ import { HomePage } from '../home/home';
 import { Storage } from '@ionic/storage';
 import { PlayerService } from '../../services/player.service';
 import { StatementService } from '../../services/statementgen.service';
+import {VgAPI} from 'videogular2/core';
 
 @Component({
   templateUrl: 'lesson2.html',
@@ -245,7 +246,7 @@ export class Lesson2Page {
 
   presentModal(response, isCorrect) {
     let modal = this.modalCtrl.create(L2Q1ModalPage);
-    this.statement.questionAnswered("lesson2", "1", this.slideShow.getActiveIndex(), response, isCorrect, this.slidePercentage);
+    this.statement.questionAnswered("lesson2", "1", this.slideShow.getActiveIndex()+1, response, isCorrect, this.slidePercentage);
     modal.present();
     modal.onDidDismiss(data=>{
       //This is a listener which will get the data passed from modal when the modal's view controller is dismissed
@@ -260,7 +261,7 @@ export class Lesson2Page {
       userName: this.userName,
       userEmail: this.userEmail,
     });
-    this.statement.questionAnswered("lesson2", "2", this.slideShow.getActiveIndex(), response, isCorrect, this.slidePercentage);
+    this.statement.questionAnswered("lesson2", "2", this.slideShow.getActiveIndex()+1, response, isCorrect, this.slidePercentage);
     modal.present();
     modal.onDidDismiss(data=>{
       //This is a listener which will get the data passed from modal when the modal's view controller is dismissed
@@ -272,7 +273,10 @@ export class Lesson2Page {
 
   getSlideProgress() {
     let currentIndex = this.slideShow.getActiveIndex();
+    let currentSlideNum = this.slideShow.getActiveIndex() + 1;
     let currentSlide = this.slides[this.slideShow.getActiveIndex()];
+    // Clear interval for videos
+    this.player.clearUpdateTimer();
     // Get percentage completion
     this.slidePercentage = this.slideShow.getActiveIndex()/(this.slideShow.length() - 1) * 100;
     // If slide has a video id, then launch the YouTube iframe API
@@ -283,13 +287,13 @@ export class Lesson2Page {
       lesson2Progress: this.slidePercentage || 0,
     }
     this.events.publish('lesson2Progress', data);
-    this.statement.lessonProgressed("lesson2", this.slideShow.getActiveIndex(), this.slideShow.length(), this.slidePercentage);
+    this.statement.lessonProgressed("lesson2", currentSlideNum, this.slideShow.length(), this.slidePercentage);
 
     // Lock slideshow until questions answered
-    if(currentIndex === 7 && !this.completedL2Q1) {
+    if(currentSlideNum === 8 && !this.completedL2Q1) {
       this.slideShow.lockSwipes(true);
     }
-    if(currentIndex === 18 && !this.completedL2Q2) {
+    if(currentSlideNum === 19 && !this.completedL2Q2) {
       this.slideShow.lockSwipes(true);
     }
 
@@ -327,6 +331,10 @@ export class Lesson2Page {
     });
   }
 
+  ionViewWillLeave() {
+    // Clear interval for videos
+    this.player.clearUpdateTimer();
+  }
 }
 
 @Component({
@@ -383,7 +391,29 @@ export class L2Q1ModalPage {
     <ion-content class="lesson-page">
       <p class="modal-page">In this instance, it might be easy to assume that you have a training problem because you were told that it was, but by asking more questions and observing employees at work, you may find that what would be most helpful would be an interactive job aid that employees use for a period of several months that translated the old number into the new number. After typing in the new number over a period of time, the employees will have memorized it.</p>
       <p class="modal-page">You didn’t have a training problem at all, and doing descriptive research would help you to uncover that.</p>
-      <p class="modal-page">Check out the real-world inspiration for this scenario on the Dear Instructional Designer Podcast: <br/><audio #dearIDEpisode43 controls="controls"> <source src="https://audio.simplecast.com/17c5013f.mp3" /></audio></p>
+      <p class="modal-page">Check out the real-world inspiration for this scenario on the Dear Instructional Designer Podcast:</p>
+      <vg-player style="height: 70px;" (onPlayerReady)="onPlayerReady($event)">
+        <vg-scrub-bar [vgSlider]="true">
+          <vg-scrub-bar-current-time [vgSlider]="true"></vg-scrub-bar-current-time>
+          <vg-scrub-bar-buffering-time></vg-scrub-bar-buffering-time>
+        </vg-scrub-bar>
+        <vg-controls>
+          <vg-play-pause></vg-play-pause>
+          <vg-playback-button></vg-playback-button>
+
+          <vg-time-display vgProperty="current" vgFormat="mm:ss"></vg-time-display>
+          <vg-scrub-bar style="pointer-events: none;"></vg-scrub-bar>
+          <!-- <vg-time-display vgProperty="left" vgFormat="mm:ss"></vg-time-display> -->
+          <vg-time-display vgProperty="total" vgFormat="mm:ss"></vg-time-display>
+
+          <vg-mute></vg-mute>
+
+        </vg-controls>
+
+        <audio #dearIdEpisode43 [vgMedia]="dearIdEpisode43"  id="dearId43" preload="auto" crossorigin>
+          <source src="assets/audio/Episode_43_v4_full_fixed_after_review.mp3" type="audio/mp3">
+        </audio>
+      </vg-player>
     </ion-content>
   `
 })
@@ -392,6 +422,10 @@ export class L2Q2ModalPage {
   answered2Question: boolean = true;
   userEmail: string = this._navParams.get('userEmail');
   userName: string = this._navParams.get('userName');
+  episode: any;
+  lastAudioPlayerState: string;
+  preload: string = 'auto';
+  api: VgAPI;
   constructor(
     public platform: Platform,
     public viewCtrl: ViewController,
@@ -403,16 +437,65 @@ export class L2Q2ModalPage {
   }
   @ViewChild('dearIDEpisode43') dearIDEpisode;
   ionViewDidLoad() {
-    let episode = {
-      audio: this.dearIDEpisode,
+    this.episode = {
       name: "Episode 43: A Tale of Two Projects with Zsolt Olah",
       episodeNum: 43,
       podcastName: "Dear Instructional Designer",
       podcastHost: "Kristin Anthony",
       episodeLink: "https://dearinstructionaldesigner.simplecast.fm/episode-43-zsolt-olah",
     };
-    this.events.publish("podcastEpisodeLoaded", episode);
   }
+
+  onPlayerReady(api:VgAPI) {
+    this.api = api;
+
+    this.api.getDefaultMedia().subscriptions.ended.subscribe(
+      () => {
+        // Set the video to the beginning
+        this.api.getDefaultMedia().currentTime = 0;
+        // fire ended statement
+        this.player.podcastEnded(this.episode.name, this.episode.episodeLink, this.episode.podcastName, this.episode.episodeNum, this.episode.podcastHost);
+      }
+    );
+
+    this.api.getDefaultMedia().subscriptions.play.subscribe(
+      () => {
+        // Fire play statement
+        //console.log("play");
+        this.player.podcastPlayed(this.episode.name, this.episode.episodeLink, this.episode.podcastName, this.episode.episodeNum, this.episode.podcastHost);
+        let s = this.api.getDefaultMedia().currentTime;
+        if(this.lastAudioPlayerState !== "paused" || s === 0) {
+          this.player.audioLastTime = s;
+        }
+        this.lastAudioPlayerState = this.api.getDefaultMedia().state;
+      }
+    );
+
+    this.api.getDefaultMedia().subscriptions.pause.subscribe(
+      () => {
+        // Fire pause statement
+        let s = this.api.getDefaultMedia().currentTime;
+        //console.log("paused");
+        this.player.audioCurrentTime = s;
+        this.player.podcastPaused(this.player.audioLastTime, this.player.audioCurrentTime, this.episode.name, this.episode.episodeLink, this.episode.podcastName, this.episode.episodeNum, this.episode.podcastHost);
+        if(this.lastAudioPlayerState === "playing") {
+          this.player.audioLastTime = s;
+        }
+        this.lastAudioPlayerState = this.api.getDefaultMedia().state;
+      }
+    );
+
+    this.api.getDefaultMedia().subscriptions.seeked.subscribe(
+      () => {
+        // Fire seeked statement
+        let s = this.api.getDefaultMedia().currentTime;
+        //console.log("seeked");
+        this.player.audioCurrentTime = s;
+        this.player.podcastSeeked(this.player.audioLastTime, this.player.audioCurrentTime, this.episode.name, this.episode.episodeLink, this.episode.podcastName, this.episode.episodeNum, this.episode.podcastHost);
+        this.player.audioLastTime = s;
+      }
+    );
+}
 
   dismiss() {
     this.viewCtrl.dismiss(this.answered2Question);
