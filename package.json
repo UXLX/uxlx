@@ -93,19 +93,19 @@
             "cordova-plugin-buildinfo": {},
             "cordova-plugin-browsertab": {},
             "cordova-universal-links-plugin": {},
-            "cordova-plugin-customurlscheme": {
-                "URL_SCHEME": "io.ionic.uxlx",
-                "ANDROID_SCHEME": " ",
-                "ANDROID_HOST": " ",
-                "ANDROID_PATHPREFIX": "/"
-            },
-            "cordova-plugin-googleplus": {
-                "REVERSED_CLIENT_ID": "com.googleusercontent.apps.919887709507-11gl2nj4e10bip4ufu6ip3f8g2qm3gd8"
-            },
             "twitter-connect-plugin": {
                 "FABRIC_KEY": "fd80c4f311294ab8590b2e0a7173ab91a3424443"
             },
-            "cordova-plugin-nativeaudio": {}
+            "cordova-plugin-nativeaudio": {},
+            "cordova-plugin-customurlscheme": {
+                "URL_SCHEME": "io.ionic.uxlx",
+                "ANDROID_SCHEME": "io.ionic.uxlx",
+                "ANDROID_HOST": "https://uxlx-3b266.firebaseapp.com",
+                "ANDROID_PATHPREFIX": "/cordova/io.ionic.uxlx/callback"
+            },
+            "cordova-plugin-googleplus": {
+                "REVERSED_CLIENT_ID": "com.googleusercontent.apps.919887709507-11gl2nj4e10bip4ufu6ip3f8g2qm3gd8"
+            }
         },
         "platforms": [
             "android",
