@@ -1,7 +1,9 @@
-import { Component } from '@angular/core';
-import { Platform, NavController } from 'ionic-angular';
+import { Component, ViewChild } from '@angular/core';
+import { Platform, NavController, Slides, Events } from 'ionic-angular';
+import { AngularFireAuth } from 'angularfire2/auth';
 import { HomePage } from '../home/home';
 import { Storage } from '@ionic/storage';
+import { StatementService } from '../../services/statementgen.service';
 
 @Component({
   templateUrl: 'intro.html'
@@ -11,9 +13,23 @@ export class IntroPage {
   constructor(
     public navCtrl: NavController,
     public platform: Platform,
-    private _storage: Storage) {
+    public afAuth: AngularFireAuth,
+    public events: Events,
+    public statement: StatementService,
+    private _storage: Storage,) {
       //initialize your page here
+      afAuth.authState.subscribe( user => {
+        if (user) {
+          this.userProfile = user;
+          this.statement.giveCreds(this.userProfile.displayName, this.userProfile.email, "Kristin Anthony", "kristin@knanthony.com");
+        }
+      });
   }
+  @ViewChild(Slides) slideShow: Slides;
+  slidePercentage: number;
+  introComplete: boolean = false;
+  userProfile: any = null;
+
   slides = [
     {
       title: "User Experience Design",
@@ -32,9 +48,37 @@ export class IntroPage {
     }
   ];
 
+  getSlideProgress() {
+    let currentIndex = this.slideShow.getActiveIndex() + 1;
+    // Get percentage completion
+    this.slidePercentage = this.slideShow.getActiveIndex()/(this.slideShow.length() - 1) * 100;
+    this.statement.introProgressed(currentIndex, this.slideShow.length(), this.slidePercentage);
+
+    this._storage.set('currentIntroSlide', currentIndex);
+
+    if(this.slideShow.isEnd()) {
+      this.introComplete = true;
+      this._storage.set('introComplete', true);
+    }
+  }
+
+  introSlidesComplete() {
+    this._storage.get('introComplete').then((val) => {
+      if (!val) {
+        this.statement.completedIntro(this.slidePercentage);
+      }
+    });
+  }
+
   goHome() {
-    this.navCtrl.setRoot(HomePage);
-    this._storage.set('hasSeenTutorial', true);
+    this.afAuth.authState.subscribe( user => {
+      if (user) {
+        this.navCtrl.setRoot(HomePage);
+      } else {
+        this.navCtrl.setRoot('LoginPage');
+      }
+      this._storage.set('hasSeenTutorial', true);
+    });
   }
 
 }

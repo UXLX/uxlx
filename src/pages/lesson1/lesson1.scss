@@ -98,6 +98,24 @@
     background: map-get($colors, primary);
   }
 
+  .read-up-links {
+    margin-left: 10px;
+    text-align: left;
+    width: 80%;
+  }
+
+  .read-up-links li {
+    padding-bottom: 0.8em;
+  }
+
+  .read-up-links a {
+    text-decoration: underline;
+  }
+
+  .read-up-links a:hover {
+    cursor: pointer;
+  }
+
   /* From https://benmarshall.me/responsive-iframes/ */
 
   .intrinsic-container {

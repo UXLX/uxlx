@@ -5,7 +5,10 @@ import { SplashScreen } from '@ionic-native/splash-screen';
 import { ScreenOrientation } from '@ionic-native/screen-orientation';
 import { Storage } from '@ionic/storage';
 import { GooglePlus } from '@ionic-native/google-plus';
+import { TwitterConnect } from '@ionic-native/twitter-connect';
 import firebase from 'firebase';
+import { AngularFireAuth } from 'angularfire2/auth';
+import { StatementService } from '../services/statementgen.service';
 
 import { HomePage } from '../pages/home/home';
 import { IntroPage } from '../pages/intro/intro';
@@ -17,22 +20,28 @@ export class MyApp {
   @ViewChild(Nav) nav: Nav;
 
   rootPage: any = HomePage;
-  public userProfile:any = null;
+  public userProfile: any = null;
+  initialStatement: any;
 
   pages: Array<{title: string, component: any}>;
-  googleSignOut():void {
-    firebase.auth().signOut();
-    this._googlePlus.logout();
-    this.nav.goToRoot(this.rootPage);
+  signOut(): firebase.Promise<any> {
+    let self = this;
+    return this.afAuth.auth.signOut().then(() => {
+      self._twitter.logout();
+      self._googlePlus.logout();
+    });
   }
 
   constructor(
     public platform: Platform,
     public statusBar: StatusBar,
     public splashScreen: SplashScreen,
+    public statement: StatementService,
     private _storage: Storage,
     private _screenOrientation: ScreenOrientation,
-    private _googlePlus: GooglePlus) {
+    private _googlePlus: GooglePlus,
+    private _twitter: TwitterConnect,
+    public afAuth: AngularFireAuth) {
       // Check if the user has already seen the tutorial
       this._storage.get('hasSeenTutorial')
         .then((hasSeenTutorial) => {
@@ -53,36 +62,25 @@ export class MyApp {
       { title: 'Getting Started', component: IntroPage },
     ];
 
-    firebase.initializeApp({
-        apiKey: "AIzaSyDjXOOsmjuq-k6m7_sLYsU9zX955154Eew",
-        authDomain: "uxlx-3b266.firebaseapp.com",
-        databaseURL: "https://uxlx-3b266.firebaseio.com/",
-        projectId: "uxlx-3b266",
-        storageBucket: "gs://uxlx-3b266.appspot.com",
-        messagingSenderId: "919887709507",
-      });
+    afAuth.authState.subscribe( user => {
+      if (user) {
+        //user.email gets the email
+        //console.log(user);
+        this.userProfile = user;
+        this.statement.giveCreds(this.userProfile.displayName, this.userProfile.email, "Kristin Anthony", "kristin@knanthony.com");
+        this.statement.launchApp();
+        this._storage.get('hasSeenTutorial').then((val) => {
+          if (!val) {
+            this.nav.setRoot(IntroPage);
+          } else {
+            this.nav.setRoot(HomePage);
+          }
+        });
 
-      firebase.auth().getRedirectResult().then(function(result) {
-        if (result.credential) {
-          var token = result.credential.accessToken;
-          var user = result.user;
-          //console.log(token, user);
-        }
-      }).catch(function(error) {
-        // Handle Errors here.
-        var errorMessage = error.message;
-        console.log(errorMessage);
-      });
-
-      firebase.auth().onAuthStateChanged( user => {
-        if (user) {
-          //user.email gets the email
-          //console.log(user);
-          this.userProfile = user;
-        } else {
-          console.log("There's no user here");
-        }
-      });
+      } else {
+        this.nav.setRoot('LoginPage');
+      }
+    });
 
   }
 
@@ -98,7 +96,16 @@ export class MyApp {
   openPage(page) {
     // Reset the content nav to have just this page
     // we wouldn't want the back button to show in this scenario
-    this.nav.setRoot(page.component);
+    this.afAuth.authState.subscribe( user => {
+      if (page.title === "Home" && user || page.title !== "Home") {
+        this.nav.setRoot(page.component);
+        if(page.title === "Getting Started" && user) {
+          this.statement.launchOnboarding();
+        }
+      } else if  (page.title === "Home" && !user) {
+        this.nav.setRoot('LoginPage');
+      }
+    });
   }
 
 

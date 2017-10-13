@@ -2,12 +2,12 @@ import { Component, ViewChild } from '@angular/core';
 import { Platform, NavController, NavParams, ModalController, ViewController, Slides, Events } from 'ionic-angular';
 import { HomePage } from '../home/home';
 import { Storage } from '@ionic/storage';
-import { Network } from '@ionic-native/network';
 import { PlayerService } from '../../services/player.service';
+import { StatementService } from '../../services/statementgen.service';
 
 @Component({
   templateUrl: 'lesson1.html',
-  providers: [PlayerService],
+  providers: [PlayerService, StatementService]
 })
 
 export class Lesson1Page {
@@ -20,18 +20,12 @@ export class Lesson1Page {
     public modalCtrl: ModalController,
     public events: Events,
     private _storage: Storage,
-    private _network: Network,
     private _navParams: NavParams,
-    public player: PlayerService) {
+    public player: PlayerService,
+    public statement: StatementService) {
       //initialize your page here
-      // watch network for a disconnect
-      this._network.onDisconnect().subscribe(() => {
-        console.log('network was disconnected :-(');
-      });
-      this.platform.ready().then(() => {
-        // Now all cordova plugins are ready!
-        console.log(this._network.type);
-      });
+      this.statement.giveCreds(this.userName, this.userEmail, "Kristin Anthony", "kristin@knanthony.com");
+      this.player.giveCreds(this.userName, this.userEmail, "Kristin Anthony", "kristin@knanthony.com", "lesson1");
   }
   @ViewChild(Slides) slideShow: Slides;
   slidePercentage: number;
@@ -68,6 +62,7 @@ export class Lesson1Page {
       description: "The discipline of User Experience (UX) is about tackling those assumptions up front to build a better product.",
       videoUrl: "https://www.youtube.com/embed/Ovj4hFxko7c?rel=0?enablejsapi=1",
       videoId: "Ovj4hFxko7c",
+      playerId: "youTubeIframeLesson1Video1"
     },
     {
       title: "Ask Yourself",
@@ -166,74 +161,104 @@ export class Lesson1Page {
     {
       title: "Read Up",
       titleClass: "lesson-special-title",
-      description: "Here are some resources to get you started. <ul><li><a href='https://abass.co/blog/why-you-should-run-usability-testing-everything'>Why You should run Usability Testing on Everything</a></li><li><a href='https://www.ideo.com/news/informing-our-intuition-design-research-for-radical-innovation/'>Informing Our Intuition: Design Research for Radical Innovation</a></li><li><a href='https://abookapart.com/products/just-enough-research'>Just Enough Research</a></li></ul>",
+      description: "Here are some resources to get you started.",
+      links: [
+        {
+          title: "Why You should run Usability Testing on Everything",
+          href: "https://abass.co/blog/why-you-should-run-usability-testing-everything"
+        },
+        {
+          title: "Informing Our Intuition: Design Research for Radical Innovation",
+          href: "https://www.ideo.com/news/informing-our-intuition-design-research-for-radical-innovation/"
+        },
+        {
+          title: "Just Enough Research",
+          href: "https://abookapart.com/products/just-enough-research"
+        }
+      ],
       specialImg: "assets/icons/readUp.png",
       lastCard: true,
     },
   ];
 
-
-
   goHome() {
     this.navCtrl.setRoot(HomePage);
   }
 
-  presentModal() {
+  presentModal(response, isCorrect) {
     let modal = this.modalCtrl.create(L1Q1ModalPage);
+    this.statement.questionAnswered("lesson1", "1", this.slideShow.getActiveIndex()+1, response, isCorrect, this.slidePercentage);
     modal.present();
     modal.onDidDismiss(data=>{
       //This is a listener which will get the data passed from modal when the modal's view controller is dismissed
       this.completedQ1 = data;
       this.slideShow.lockSwipes(false);
       this._storage.set('lesson1Q1Complete', data);
-    })
+    });
   }
 
   getSlideProgress() {
     let currentIndex = this.slideShow.getActiveIndex();
+    let currentSlideNum = this.slideShow.getActiveIndex() + 1;
     let currentSlide = this.slides[this.slideShow.getActiveIndex()];
-
-    //console.log('Current index is', currentIndex);
+    // Clear interval for videos
+    this.player.clearUpdateTimer();
+    // Get percentage completion
     this.slidePercentage = this.slideShow.getActiveIndex()/(this.slideShow.length() - 1) * 100;
-    //console.log('Lesson Page: Slide Progress is ' + this.slidePercentage);
-    if(currentSlide.hasOwnProperty('videoId')) {
-      console.log(currentSlide['videoId']);
-
-      this.player.launchPlayer(currentSlide['videoId'], this.userEmail, this.userName);
-      console.log(this.player);
+    // If slide has a video id, then launch the YouTube iframe API
+    if(currentSlide && currentSlide.hasOwnProperty('videoId')) {
+      this.player.launchPlayer(currentSlide['videoId'], currentSlide['playerId']);
     }
     let data = {
       lesson1Progress: this.slidePercentage || 0,
     }
     this.events.publish('lessonProgress', data);
-    if(currentIndex === 11 && !this.completedQ1) {
+    this.statement.lessonProgressed("lesson1", currentSlideNum, this.slideShow.length(), this.slidePercentage);
+
+    //Lock slideshow until answer question
+    if(currentSlideNum === 12 && !this.completedQ1) {
       this.slideShow.lockSwipes(true);
     }
     this._storage.set('currentL1Slide', currentIndex);
+
     if(this.slideShow.isEnd()) {
       this.lessonComplete = true;
-      //console.log(this.slideShow.isEnd());
       this._storage.set('lesson1Complete', true);
     }
   }
 
+  launchLink(url, title) {
+    this.statement.launchLink("lesson1", url, title);
+  }
+
+  lessonSlidesComplete() {
+    this._storage.get('lesson1Complete').then((val) => {
+      if (!val) {
+        this.statement.completedLesson("lesson1", this.slidePercentage);
+      }
+    });
+  }
+
   ionViewWillEnter() {
     this._storage.get('currentL1Slide').then((val) => {
-      this.slideShow.slideTo(val, 0);
+      this.slideShow.slideTo(val, 500);
     });
   }
 
   ionViewDidLoad() {
     this._storage.get('lesson1Q1Complete').then((val) => {
-      //console.log('Did you answer the question? ', val);
       this.completedQ1 = val;
     });
   }
 
   ionSlideDidChange() {
-    console.log(this.slideShow.getActiveIndex());
+    //console.log(this.slideShow.getActiveIndex());
   }
 
+  ionViewWillLeave() {
+    // Clear interval for videos
+    this.player.clearUpdateTimer();
+  }
 }
 
 @Component({

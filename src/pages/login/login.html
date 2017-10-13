@@ -1,0 +1,18 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>Login</ion-title>
+  </ion-navbar>
+</ion-header>
+<ion-content padding class="grey-bg card">
+  <ion-card padding text-center style="height: 90%;">
+      <h2>Sign In</h2>
+      <p>Why? This app tracks your participation using xAPI!</p>
+      <button ion-button block color="danger" (click)="googleLogin()">
+        <ion-icon name="logo-googleplus"></ion-icon>
+        Login with Google
+      </button>
+      <button ion-button block color="primary" (click)="twitterLogin()">
+        <ion-icon name="logo-twitter"></ion-icon>
+        Login with Twitter
+      </button>
+  </ion-card>

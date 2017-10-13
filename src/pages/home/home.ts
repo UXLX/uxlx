@@ -3,15 +3,13 @@ import { Platform, NavController, NavParams, Events } from 'ionic-angular';
 import { Lesson1Page } from '../lesson1/lesson1';
 import { Lesson2Page } from '../lesson2/lesson2';
 import { Storage } from '@ionic/storage';
-import TinCan from 'tincanjs';
-import { LRSService } from '../../services/lrs.service';
-import { GooglePlus } from '@ionic-native/google-plus';
-import firebase from 'firebase';
+import { StatementService } from '../../services/statementgen.service';
+import { AngularFireAuth } from 'angularfire2/auth';
 
 @Component({
   selector: 'page-home',
   templateUrl: 'home.html',
-  providers: [LRSService],
+  providers: [StatementService],
 })
 export class HomePage {
   getUpdatedProgress: any;
@@ -21,94 +19,21 @@ export class HomePage {
   lesson2Complete: boolean = false;
   initialStatement: any;
   public userProfile: any = null;
-    googleLogin():void {
-      if (this.platform.is('cordova')) {
-        this._googlePlus.login({
-        'webClientId': '919887709507-11gl2nj4e10bip4ufu6ip3f8g2qm3gd8.apps.googleusercontent.com',
-        'offline': true
-        }).then( res => {
-          const googleCredential = firebase.auth.GoogleAuthProvider
-              .credential(res.idToken);
-          firebase.auth().signInWithCredential(googleCredential)
-        .then( response => {
-            console.log("Firebase success: " + JSON.stringify(response));
-        });
-        }, err => {
-          console.error("Error: ", err)
-        });
-      } else {
-        const provider = new firebase.auth.GoogleAuthProvider();
-        firebase.auth().signInWithRedirect(provider).then( () => {
-          firebase.auth().getRedirectResult().then( result => {
-            // This gives you a Google Access Token.
-            // You can use it to access the Google API.
-            var token = result.credential.accessToken;
-            // The signed-in user info.
-            var user = result.user;
-            console.log(token, user);
-          }).catch(function(error) {
-            // Handle Errors here.
-            console.log(error.message);
-          });
-        });
-      }
-    }
 
   constructor(
   public navCtrl: NavController,
   public platform: Platform,
   public navParams: NavParams,
   public events: Events,
-  public lrs: LRSService,
-  private _storage: Storage,
-  private _googlePlus: GooglePlus) {
+  public statement: StatementService,
+  public afAuth: AngularFireAuth,
+  private _storage: Storage) {
     this.loadProgress();
     //this._storage.clear();
-
-    firebase.auth().onAuthStateChanged( user => {
+    afAuth.authState.subscribe( user => {
       if (user) {
-        //user.email gets the email
-        console.log(user);
         this.userProfile = user;
-        this.initialStatement = new TinCan.Statement({
-            actor: {
-                name: user.displayName,
-                mbox: user.email,
-            },
-            verb: {
-                id: "https://brindlewaye.com/xAPITerms/verbs/loggedin/",
-                display: {'en-US': 'logged in to'}
-            },
-            "object": {
-              "id": "http://example.com/activities/ux-lx-app",
-                "definition": {
-                  "type": "http://activitystrea.ms/schema/1.0/application",
-                  "name": { "en-US": "UX + LX app" }
-                }
-            },
-        });
-        this.lrs.lrs.saveStatement(
-          this.initialStatement,
-          {
-            callback: function (err, xhr) {
-              if (err !== null) {
-                if (xhr !== null) {
-                  console.log("Failed to save statement: " + xhr.responseText + " (" + xhr.status + ")");
-                  // TODO: do something with error, didn't save statement
-                  return;
-                }
-                console.log("Failed to save statement: " + err);
-                // TODO: do something with error, didn't save statement
-                return;
-              }
-              console.log("Statement saved");
-              // TODO: do something with success (possibly ignore)
-            }
-          }
-        );
-      } else {
-        this.userProfile = null;
-        console.log("There's no user here");
+        this.statement.giveCreds(this.userProfile.displayName, this.userProfile.email, "Kristin Anthony", "kristin@knanthony.com");
       }
     });
   }
@@ -124,14 +49,19 @@ export class HomePage {
   };
 
   lessonOne() {
+    this.statement.launchedLesson("Lesson 1: What is UX and Why do I Need it?", "lesson1", this.lesson1Progress);
     this.navCtrl.setRoot(Lesson1Page, {
       userName: this.userProfile.displayName,
       userEmail: this.userProfile.email,
-    })
+    });
   }
 
   lessonTwo() {
-    this.navCtrl.setRoot(Lesson2Page)
+    this.statement.launchedLesson("Lesson 2: Which One's Which?", "lesson2", this.lesson2Progress);
+    this.navCtrl.setRoot(Lesson2Page, {
+      userName: this.userProfile.displayName,
+      userEmail: this.userProfile.email,
+    });
   }
 
   ionViewDidLoad(){

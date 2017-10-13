@@ -23,11 +23,15 @@
         "@ionic-native/core": "3.12.1",
         "@ionic-native/google-plus": "^4.2.1",
         "@ionic-native/in-app-browser": "^4.2.1",
+        "@ionic-native/media": "^4.2.1",
+        "@ionic-native/native-audio": "^4.2.1",
         "@ionic-native/network": "^4.2.1",
         "@ionic-native/screen-orientation": "^4.2.1",
         "@ionic-native/splash-screen": "3.12.1",
         "@ionic-native/status-bar": "3.12.1",
+        "@ionic-native/twitter-connect": "^4.2.1",
         "@ionic/storage": "^2.0.1",
+        "angularfire2": "^4.0.0-rc.2",
         "cordova-android": "^6.2.3",
         "cordova-ios": "^4.4.0",
         "cordova-plugin-add-swift-support": "^1.7.0",
@@ -40,6 +44,7 @@
         "cordova-plugin-googleplus": "^5.1.1",
         "cordova-plugin-inappbrowser": "^1.7.1",
         "cordova-plugin-ionic": "^1.1.8",
+        "cordova-plugin-nativeaudio": "^3.0.9",
         "cordova-plugin-network-information": "^1.3.3",
         "cordova-plugin-screen-orientation": "^2.0.1",
         "cordova-plugin-splashscreen": "^4.0.3",
@@ -56,10 +61,13 @@
         "rxjs": "5.4.0",
         "sw-toolbox": "3.6.0",
         "tincanjs": "^0.50.0",
+        "twitter-connect-plugin": "^0.6.0",
+        "videogular2": "^5.5.2",
         "zone.js": "0.8.12"
     },
     "devDependencies": {
         "@ionic/app-scripts": "2.1.3",
+        "@types/core-js": "^0.9.43",
         "typescript": "2.3.4"
     },
     "description": "An Ionic project",
@@ -85,11 +93,15 @@
             "cordova-plugin-buildinfo": {},
             "cordova-plugin-browsertab": {},
             "cordova-universal-links-plugin": {},
+            "twitter-connect-plugin": {
+                "FABRIC_KEY": "fd80c4f311294ab8590b2e0a7173ab91a3424443"
+            },
+            "cordova-plugin-nativeaudio": {},
             "cordova-plugin-customurlscheme": {
                 "URL_SCHEME": "io.ionic.uxlx",
-                "ANDROID_SCHEME": " ",
-                "ANDROID_HOST": " ",
-                "ANDROID_PATHPREFIX": "/"
+                "ANDROID_SCHEME": "io.ionic.uxlx",
+                "ANDROID_HOST": "https://uxlx-3b266.firebaseapp.com",
+                "ANDROID_PATHPREFIX": "/cordova/io.ionic.uxlx/callback"
             },
             "cordova-plugin-googleplus": {
                 "REVERSED_CLIENT_ID": "com.googleusercontent.apps.919887709507-11gl2nj4e10bip4ufu6ip3f8g2qm3gd8"
@@ -98,6 +110,10 @@
         "platforms": [
             "android",
             "ios"
-        ]
+        ],
+        "config": {
+            "ionic_sass": "./src/config/sass.config.js",
+            "ionic_copy": "./src/config/copy.config.js"
+        }
     }
 }
