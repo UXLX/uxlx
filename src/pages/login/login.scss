@@ -20,4 +20,26 @@ page-login {
   .card-content {
     font-size: 1.1em;
   }
+
+  @media all and (min-width: 768px) {
+    .card h2 {
+      font-size: 3em;
+    }
+
+    .card p {
+      font-size: 2em;
+    }
+
+    .card .button-md {
+      height: 5em;
+      margin-bottom: 2em;
+      margin-left: auto;
+      margin-right: auto;
+      width: 80%;
+    }
+
+    .card .button-md span {
+      font-size: 2em;
+    }
+  }
 }
