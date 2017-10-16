@@ -51,13 +51,31 @@
     }
   }
 
+  @media all and (min-width: 768px) {
+    p {
+      font-size: 1.6em;
+    }
+
+    .skip-intro {
+      font-size: 2em;
+    }
+
+    .slide-title {
+      font-size: 2em;
+    }
+
+    .continue-button {
+      font-size: 2em;
+    }
+  }
+
   @media all and (min-width: 1000px) {
     .slide-image {
       width: 25%;
+      margin-top: 20%;
     }
 
     p {
-      font-size: 1.2em;
       width: 80%;
       margin: 0 auto;
     }

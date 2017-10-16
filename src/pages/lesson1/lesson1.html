@@ -32,16 +32,16 @@
         <hr/>
         <ion-grid>
           <ion-row>
-            <ion-col col-12 col-lg>
+            <ion-col col-12>
               <button ion-button block color="light" class="choice" (click)="presentModal(slide.choice1, true)"><p class="text-wrap">{{slide.choice1}}</p></button>
             </ion-col>
-            <ion-col col-12 col-lg>
+            <ion-col col-12>
               <button ion-button block color="light" class="choice" (click)="presentModal(slide.choice2, true)"><p class="text-wrap">{{slide.choice2}}</p></button>
             </ion-col>
           </ion-row>
         </ion-grid>
       </div>
-      <button *ngIf="slide.lastCard" ion-button large icon-end color="cyan" (click)="goHome()">
+      <button *ngIf="slide.lastCard" ion-button large icon-end color="cyan" class="done-button" (click)="goHome()">
         Done
         <ion-icon name="checkmark-circle-outline"></ion-icon>
       </button>

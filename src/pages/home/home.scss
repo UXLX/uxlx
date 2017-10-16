@@ -26,6 +26,19 @@ page-home {
     font-size: 1.1em;
   }
 
+  @media all and (min-width: 768px) {
+
+    .card-content {
+      font-size: 1.3em;
+    }
+    .card-subtitle {
+      font-size: 1.3em;
+    }
+    .card-title {
+      font-size: 2em;
+    }
+  }
+
   @media all and (min-width: 1330px) {
     .scroll-content .card {
       width: 60%;
