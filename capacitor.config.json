@@ -1,0 +1,8 @@
+{
+  "appId": "io.ionic.starter",
+  "appName": "UXLX",
+  "bundledWebRuntime": false,
+  "npmClient": "npm",
+  "webDir": "build",
+  "cordova": {}
+}

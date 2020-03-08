@@ -1,0 +1,95 @@
+:root {
+  --ion-safe-area-top: 20px;
+  --ion-safe-area-bottom: 22px;
+}
+
+.swiper-slide {
+  background: #fff;
+}
+
+/* Pagination */
+
+.tutorial-page .swiper-pagination {
+  position: relative;
+  bottom: 0;
+}
+
+.tutorial-page .swiper-pagination-bullet-active {
+  background: #2fabdd;
+}
+
+.tutorial-page .swiper-pagination-bullet {
+  width: 15px;
+  height: 15px;
+}
+
+
+.tutorial-page .toolbar-background {
+  background: #fff;
+  border-color: transparent;
+}
+.tutorial-page .slide-zoom {
+  height: 100%;
+}
+.tutorial-page .slide-image {
+  max-width: 60%;
+  margin: 18px 0;
+}
+.tutorial-page b {
+  font-weight: 500;
+}
+.tutorial-page p {
+  padding: 0 40px;
+  font-size: 0.9em;
+  line-height: 1.5;
+  color: #202020;
+}
+.tutorial-page p b {
+  color: #000;
+}
+
+
+/* Media Queries */
+@media all and (max-width: 569px) {
+  .tutorial-page .slide-image {
+    max-width: 40%;
+  }
+  .tutorial-page p {
+    font-size: 0.8em;
+  }
+}
+
+@media all and (min-width: 570px) {
+  .tutorial-page .slide-image {
+    width: 30%;
+  }
+  .tutorial-page p {
+    font-size: 1.1em;
+  }
+}
+
+@media all and (min-width: 768px) {
+  .tutorial-page p {
+    font-size: 1.6em;
+  }
+  .tutorial-page .skip-intro {
+    font-size: 2em;
+  }
+  .tutorial-page .slide-title {
+    font-size: 2em;
+  }
+  .tutorial-page .continue-button {
+    font-size: 2em;
+  }
+}
+
+@media all and (min-width: 1000px) {
+  .tutorial-page .slide-image {
+    width: 25%;
+  }
+
+  .tutorial-page p {
+    width: 80%;
+    margin: 0 auto;
+  }
+}

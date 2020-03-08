@@ -1,0 +1,7 @@
+{
+  "name": "UXLX",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react"
+}
